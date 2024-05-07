@@ -3,6 +3,15 @@ const express = require("express");
 const app = express();
 const port = 5782;
 const connect = require('./config/DB');
+const authRoute = require('./routes/authRoute');
+
+// custom middlewares
+app.use(express.json())
+
+
+// API's
+
+app.use('/api/v1/auth',authRoute)
 
 // server and DB connection
 connect()
