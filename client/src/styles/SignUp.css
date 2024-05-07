@@ -1,0 +1,70 @@
+/* .img-section {
+  background: #e7edef;
+}
+
+.wrapper {
+  overflow-x: hidden;
+}
+
+.form-section {
+  background-color: #ffffff;
+}
+
+.con-pass-input-img{
+top: 12.4rem;
+width: 2rem;
+height: 2rem;
+left: 0.7rem;
+}
+
+.user-input-img{
+width: 2rem;
+height: 2rem;
+left: 0.7rem;
+top: 4.3rem;
+}
+input {
+  outline: 0;
+  border: 1.5px solid rgba(131, 151, 155, 1);
+  background: #e7edef;
+  height: 3rem;
+}
+
+form {
+  width: 30rem;
+  margin: auto;
+}
+
+.email-input-img {
+  height: 2rem;
+  width: 2rem;
+  top: 0.5rem;
+  left: 0.7rem;
+}
+
+.pass-input-img {
+  height: 2rem;
+  width: 2rem;
+  top: 8.4rem;
+  left: 0.7rem;
+}
+
+.sign-up-eye-img-2{
+  top: 12.5rem;
+}
+
+.sign-up-eye-img{
+  top: 8.5rem;
+} */
+
+@media (max-width: 425px) {
+  form {
+    width: 90%;
+    margin: auto;
+    max-height: 100vh;
+  }
+
+  .header-div {
+    margin-top: 5rem;
+  }
+}

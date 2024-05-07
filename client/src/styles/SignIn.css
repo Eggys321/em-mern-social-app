@@ -1,0 +1,53 @@
+/* .img-section {
+  background: #e7edef;
+}
+
+.wrapper {
+  overflow-x: hidden;
+}
+
+.form-section {
+  background-color: #ffffff;
+}
+
+input {
+  outline: 0;
+  border: 1.5px solid rgba(131, 151, 155, 1);
+  background: #e7edef;
+  height: 3rem;
+}
+
+form {
+  width: 30rem;
+  margin: auto;
+}
+
+.email-input-img {
+  height: 2rem;
+  width: 2rem;
+  top: 0.5rem;
+  left: 0.7rem;
+}
+
+.eye-img{
+  top: 4.6rem;
+}
+
+.login-pass-input-img {
+  height: 2rem;
+  width: 2rem;
+  top: 4.4rem;
+  left: 0.7rem;
+} */
+
+@media (max-width: 425px) {
+  form {
+    width: 90%;
+    margin: auto;
+    max-height: 100vh;
+  }
+
+  .header-div {
+    margin-top: 5rem;
+  }
+}

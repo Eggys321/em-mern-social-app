@@ -1,0 +1,59 @@
+.nav-container {
+  height: 6rem;
+}
+
+.search-img {
+  left: 1rem;
+  top: 0.7rem;
+}
+
+.search-box {
+  width: 25rem;
+}
+
+.nav-bag {
+  top: 4.6rem;
+  right: -.3rem;
+}
+
+ .first-div{
+  margin-bottom: -.5rem;
+}
+.log-out-img {
+  padding-left: -4rem;
+}
+
+.nav-section{
+  position: fixed;
+  bottom: 0;
+  /* background: #90A4AE; */
+}
+
+.off-div{
+  width: rem;
+}
+
+
+
+@media (max-width: 425px) {
+  .nav-container {
+    height: 4rem;
+  }
+
+  .search-img {
+    top: 0.5rem;
+  }
+
+  /* .off-img{
+    width: 6rem;
+  } */
+  /* .logo-img {
+    width: 2rem;
+  } */
+  .search-box {
+    width: 20rem;
+    height: 2.5rem;
+    margin: auto;
+    
+  }
+}
