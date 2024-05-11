@@ -4,6 +4,8 @@ import SignIn from './auth/SignIn';
 import SignUp from './auth/SignUp';
 import ResetPassword from './auth/ResetPassword';
 import Home from './pages/Home.jsx';
+import { Toaster } from 'react-hot-toast';
+
 function App() {
   return (
     <>
@@ -15,6 +17,8 @@ function App() {
           <Route path='/resetpassword' element={<ResetPassword />}/>
         </Routes>
       </BrowserRouter>
+      <Toaster/>
+
     </>
   );
 }
