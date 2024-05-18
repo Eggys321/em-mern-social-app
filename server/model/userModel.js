@@ -50,16 +50,23 @@ const userSchema = new Schema({
         type:String,
     },
     location:{
-        type:String
+        type:String,
+        default:"location"
+
     },
     occupation:{
-        type:String
+        type:String,
+        default:"occupation"
+
     },
     x:{
-        type:String
+        type:String,
+        default:"x account"
     },
     linkedIn:{
-        type:String
+        type:String,
+        default:"linkedIn account"
+
     },
     followers:[{type:mongoose.Schema.ObjectId,ref:"User"}],
     following:[{type:mongoose.Schema.ObjectId,ref:"User"}],
@@ -87,7 +94,7 @@ userSchema.methods.comparePassword = async function(userPassword){
 // generate jwt token
 userSchema.methods.generateToken = async function(params){
     let token = jwt.sign({userId:this._id,userName:this.userName},process.env.JWT_SECRET,{
-        expiresIn: '1h',
+        expiresIn: '24h',
       });
 
     return token;

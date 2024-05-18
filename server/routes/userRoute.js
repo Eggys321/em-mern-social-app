@@ -1,10 +1,21 @@
 const express = require("express");
-const { getUserById } = require("../controllers/userController");
+const { getBioProfile, followUser, unfollowUser, getSingleUser, getAllUsers, searchUsers} = require("../controllers/userController");
 const router = express.Router();
 const authMiddleware = require("../middleware/auth")
+// search user
+router.get("/search",searchUsers)
+// own account
+router.get('/', authMiddleware, getBioProfile);
+// follow user
+router.post("/follow/:followersId",authMiddleware,followUser)
 
-// single user by id
-router.get('/:userId', authMiddleware, getUserById);
+// unfollow user
+router.post("/unfollow/:followersId",authMiddleware,unfollowUser);
+// single user
+router.get("/userprofile/:userId", getSingleUser);
+
+// all users
+router.get("/all",getAllUsers)
 
 
 

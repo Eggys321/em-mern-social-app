@@ -6,10 +6,13 @@ const connect = require('./config/DB');
 const authRoute = require('./routes/authRoute');
 const userRoute = require("./routes/userRoute")
 const cors = require("cors");
+const morgan = require("morgan")
 
 // custom middlewares
-app.use(express.json())
-app.use(cors())
+app.use(express.json());
+app.use(cors());
+app.use(morgan('common'));
+
 
 
 // API's

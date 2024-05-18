@@ -1,11 +1,8 @@
-import { useState } from 'react';
+import { useState,useEffect } from 'react';
 import NavSection from '../components/NavSection';
 import Navbar from '../layouts/Navbar';
 import profileImg from '../assets/profile-img.svg';
-import locationImg from '../assets/location.svg';
-import realtorImg from '../assets/realtor.svg';
-import linkedinImg from '../assets/linkedin.svg';
-import twitterImg from '../assets/twitter.svg';
+
 import '../styles/Home.css';
 import Post from '../components/Post';
 import { people } from '../db';
@@ -13,74 +10,54 @@ import commentImg from '../assets/comment-image.svg';
 import likeImg from '../assets/like-img.svg';
 import shareImg from '../assets/share-img.svg';
 import CommentModal from '../components/ComentModal';
+import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
+import Bio from '../components/Bio';
 const Home = () => {
   const [modalShow, setModalShow] = useState(false);
+  const [bioProfile,setBioProfile] = useState([])
   console.log(people);
+  const navigate = useNavigate()
+  const token = localStorage.getItem("clientToken");
+
+  const getBioProfile = async ()=>{
+    try {
+      
+      const request = await fetch("http://localhost:5782/api/v1/users",{
+        headers:{
+          "Content-type":"application/json",
+          Authorization:`Bearer ${token}`
+        }
+      })
+      const response = await request.json();
+      console.log(response.user);
+      setBioProfile(response.user)
+    } catch (error) {
+      console.log(error.message);
+    }
+  }
+
+  useEffect(()=>{
+      if(!token){
+        toast.error("unauthorized,sign in")
+          navigate('/signin');
+      }
+      getBioProfile()
+  },[])
 
   return (
     <>
       {/* nav */}
       <Navbar />
+      
 
       {/* main content */}
       <div className='home-wrapper'>
         <div className='container'>
           <main className=' row home-main gap-2 pt-3'>
-            {/* profile col */}
-            <section className='vh-100 col-lg-4 d-none d-lg-block p-2 rounded-2 border profile-section '>
-              {/* profile div */}
-              <div className='d-flex align-items-center gap-2'>
-                <img src={profileImg} alt='' className='profile-img' />
-                <div className='d-flex flex-column '>
-                  <span className=''>John Doe</span>
-                  <span className=''>0 friends</span>
-                </div>
-              </div>
-              <hr />
+          <section className='vh-100 col-lg-4 d-none d-lg-block p-2 rounded-2 border profile-section '>
 
-              {/* bio div */}
-              <div>
-                <h4>Bio</h4>
-                <p>
-                  Lorem ipsum dolor sit amet consectetur. Mi nec turpis
-                  vulputate sed. Tellus quisque pharetra facilisi nisl nisi
-                  consectetur. Sed in nisi convallis vitae tortor rhoncus.
-                </p>
-              </div>
-              <hr />
-
-              {/* information */}
-              <div>
-                <h4>Info</h4>
-                <div className='d-flex align-items-center gap-2'>
-                  <img src={locationImg} alt='' /> <span>Location</span>
-                </div>
-                <div className='d-flex align-items-center mt-2 gap-2'>
-                  <img src={realtorImg} alt='' /> <span>Realtor</span>
-                </div>
-              </div>
-              <hr />
-              {/* socials */}
-              <div>
-                <h4>Socials</h4>
-                <div className='d-flex align-items-center gap-2'>
-                  <a href='http://' target='_blank' rel=''>
-                    <img src={twitterImg} alt='' />
-                  </a>{' '}
-                  <span>Twitter</span>
-                </div>
-                <div className='d-flex align-items-center mt-2 gap-2'>
-                  <a href='http://' target='_blank' rel=''>
-                    <img src={linkedinImg} alt='' />
-                  </a>{' '}
-                  <span>Linkedin</span>
-                </div>
-              </div>
-              <div>
-                <hr />
-                <h3>Sponsored Ads</h3>
-                <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Omnis, explicabo.</p>
-              </div>
+            <Bio/>
             </section>
 
             {/* news-field col */}
@@ -90,7 +67,7 @@ const Home = () => {
               <div className='p-2 top-news-field rounded-2 mb-2 border'>
                 {/*  */}
                 <div className='d-flex gap-2 align-items-center'>
-                  <img src={profileImg} alt='' />
+                <img src={bioProfile?.profilePhoto} alt='' className='profile-img '  style={{borderRadius:"5rem", height:"4rem",width:"4rem"}}/>
                   <input
                     type='text'
                     className='rounded-pill ps-2 post-input w-100'

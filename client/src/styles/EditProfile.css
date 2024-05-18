@@ -1,0 +1,174 @@
+.select-img::-webkit-file-upload-button {
+    color: #fff;
+    background: rgba(21, 101, 216, 1);
+    border: none;
+    height: 100%;
+  }
+  
+  .select-img {
+    height: 2rem;
+  }
+  
+  textarea {
+    outline: 0;
+    border: 1.5px solid rgba(131, 151, 155, 1);
+    background: #e7edef;
+    padding-left: 2rem;
+  }
+  
+  .age-input {
+    width: 9rem;
+    padding-left: 2rem;
+  }
+  
+  .age-img {
+    top: 0.8rem;
+  }
+  .gender-input {
+    width: 8rem;
+    padding-left: 1.5rem;
+  }
+  
+  .location-input {
+    width: 17.3rem;
+    padding-left: 2rem;
+  }
+  
+  .occupation-input {
+    padding-left: 2.3rem;
+  }
+  .location-input-img {
+    width: 2rem;
+    height: 2rem;
+    top: 0.5rem;
+  }
+  
+  .twitter-input {
+    padding-left: 2.2rem;
+  }
+  .gender-img {
+    left: 9.5rem;
+    top: 0.8rem;
+  }
+  
+  .continue-btn {
+    width: 17.3rem;
+  }
+  
+  @media (min-width: 768px) and (max-width: 1023px) {
+    .utils {
+      width: 29rem;
+    }
+  
+    .gender-img {
+      left: 14.5rem;
+    }
+  
+    .age-input {
+      width: 14rem;
+      padding-left: 2rem;
+    }
+  
+    .gender-input {
+      width: 14.6rem;
+      padding-left: 1.5rem;
+    }
+  }
+  
+  @media (min-width: 425px) and (max-width: 767px) {
+    .utils {
+      width: 23rem;
+      margin-left: 0.1rem;
+    }
+  
+    textarea {
+      padding-left: 2.5rem;
+    }
+  
+    .age-input {
+      width: 12rem;
+      padding-left: 2rem;
+    }
+  
+    .gender-input {
+      width: 10.7rem;
+      padding-left: 1.5rem;
+    }
+  
+    
+    .gender-img {
+      left: 12.5rem;
+      top: 0.8rem;
+    }
+  
+    .location-input {
+      padding-left: 2.5rem;
+    }
+  
+    .occupation-input {
+      padding-left: 2.8rem;
+    }
+  
+    .twitter-input {
+      padding-left: 2.7rem;
+    }
+  }
+  
+  @media (min-width: 375px) and (max-width: 424px) {
+    .basic-h5 {
+      margin-left: 1rem;
+    }
+  
+    .utils{
+      width: 18.5rem;
+    }
+  
+    .age-input {
+      width: 9rem;
+      padding-left: 2rem;
+    }
+  
+    .gender-input {
+      width: 9.2rem;
+      padding-left: 1.5rem;
+    }
+  
+    
+    .gender-img {
+      left: 9.5rem;
+      top: 0.8rem;
+    }
+  
+  }
+  
+  @media (min-width: 320px) and (max-width: 374px) {
+    .edit-profile-img{
+      width: 100%;
+      margin: auto;
+    }
+  
+    .basic-h5 {
+      margin-left: 1rem;
+    }
+  
+    .utils{
+      width: 15.5rem;
+    }
+  
+    .age-input {
+      width: 7.7rem;
+      padding-left: 2rem;
+    }
+  
+    .gender-input {
+      width: 7.5rem;
+      padding-left: 1.5rem;
+    }
+  
+    
+    .gender-img {
+      left: 8rem;
+      top: 0.8rem;
+    } 
+  
+  }

@@ -1,24 +1,18 @@
+import React from 'react';
 import { useState,useEffect } from 'react';
-import Offcanvas from 'react-bootstrap/Offcanvas';
-import profileImg from '../assets/profile-img.svg';
 import locationImg from '../assets/location.svg';
 import realtorImg from '../assets/realtor.svg';
 import linkedinImg from '../assets/linkedin.svg';
 import twitterImg from '../assets/twitter.svg';
-import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
 
+const Bio = () => {
+    const [bioProfile,setBioProfile] = useState([]);
 
-function ResponsiveExample() {
-  const [show, setShow] = useState(false);
-  const [bioProfile,setBioProfile] = useState([]);
-
-
-  const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
-  const token = localStorage.getItem("clientToken");
-  const navigate = useNavigate();
-
+    const token = localStorage.getItem("clientToken");
+    const navigate = useNavigate()
+    
   const getBioProfile = async ()=>{
     try {
       
@@ -36,34 +30,30 @@ function ResponsiveExample() {
     }
   }
 
-  
   useEffect(()=>{
-    if(!token){
-      toast.error("unauthorized,sign in")
-        navigate('/signin');
-    }
-    getBioProfile()
-},[])
+      if(!token){
+        toast.error("unauthorized,sign in")
+          navigate('/signin');
+      }
+      getBioProfile()
+  },[])
 
   return (
     <>
-    <div className="off-div">
-    <img src={bioProfile?.profilePhoto} alt='' className='profile-img  logo-img img-fluid off-img d-lg-none '  style={{borderRadius:"5rem", height:"2rem"}} onClick={handleShow}/>
-      {/* <img src={bioProfile?.profilePhoto} alt='' className='logo-img img-fluid off-img d-lg-none' onClick={handleShow} /> */}
-      </div>
-      <Offcanvas show={show} onHide={handleClose} responsive="lg">
-        <Offcanvas.Header closeButton>
-        </Offcanvas.Header>
-        <Offcanvas.Body  >
-        <section className='col-lg-4 d-lg-none profile-section'>
+    <main>
+         {/* profile col */}
+            
+         
               {/* profile div */}
               <div className='d-flex align-items-center gap-2'>
-              <img src={bioProfile?.profilePhoto} alt='' className='profile-img w-25 '  style={{borderRadius:"5rem", height:"6rem"}}/>
+                <img src={bioProfile?.profilePhoto} alt='' className='profile-img w-25 '  style={{borderRadius:"5rem", height:"6rem"}}/>
                 <div className='d-flex flex-column '>
                   <span className=''> {bioProfile?.userName} </span>
                   <span className=''>{bioProfile?.followers?.length} followers</span>
                 </div>
               </div>
+              
+
               <hr />
 
               {/* bio div */}
@@ -102,11 +92,14 @@ function ResponsiveExample() {
                   <span>{bioProfile?.linkedIn} </span>
                 </div>
               </div>
-            </section>
-        </Offcanvas.Body>
-      </Offcanvas>
+              <div>
+                <hr />
+                <h3>Sponsored Ads</h3>
+                <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Omnis, explicabo.</p>
+              </div>
+    </main>
     </>
-  );
+  )
 }
 
-export default ResponsiveExample;
+export default Bio

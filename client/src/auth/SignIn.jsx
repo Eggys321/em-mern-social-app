@@ -1,23 +1,74 @@
 import loginImg from '../assets/login-img.svg';
 import logoImg from '../assets/logo.svg';
 import { useState } from 'react';
-// import FloatingLabel from 'react-bootstrap/FloatingLabel';
 import Form from 'react-bootstrap/Form';
 import { useEffect } from 'react';
 import { FiEye } from 'react-icons/fi';
 import { FiEyeOff } from 'react-icons/fi';
-// import { Link } from 'react-router-dom';
 import emailImg from '../assets/email-img.svg';
 import passWordImg from '../assets/password-img.svg';
-import { Link } from 'react-router-dom';
+import { Link,useNavigate } from 'react-router-dom';
 import '../styles/SignIn.css';
+import { useForm } from "react-hook-form";
+import Loader from "../utils/Loader";
+import { signInSchema } from '../utils/ValidationSchema';
+import { yupResolver } from "@hookform/resolvers/yup";
+import toast from 'react-hot-toast';
+
 
 const SignIn = () => {
   const [isReveal, setReveal] = useState(false);
+  const [isCLicked,setIsClicked] = useState(false);
+const navigate = useNavigate()
 
   function handleToggle() {
     !isReveal ? setReveal(true) : setReveal(false);
   }
+
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors,isSubmitting},
+  } = useForm({
+    resolver:yupResolver(signInSchema),
+    defaultValues:{
+      email:"",
+      password:""
+    }
+  });
+
+  const handleSignIn = async(data)=>{
+    console.log(data);
+    setIsClicked(true)
+
+    try {
+      const request = await fetch("http://localhost:5782/api/v1/auth/login",{
+        method:"POST",
+        headers:{
+          "Content-Type":"application/json"
+        },
+        body:JSON.stringify(data)
+      })
+      const response = await request.json();
+      console.log(response);
+      if(!response.success){
+        toast.error(response.message)
+      }
+      if(response.success){
+        toast.success(response.message)
+        localStorage.setItem("clientToken",response.user.token)
+        navigate("/")
+      }
+    } catch (error) {
+      console.log(error);
+    }finally{
+      setIsClicked(false)
+    }
+  }
+  const btnText = isCLicked ? <Loader/> : "Sign In";
+
+  console.log(errors);
 
   useEffect(() => {
     document.title = 'Login | page';
@@ -45,20 +96,23 @@ const SignIn = () => {
 
               {/* form div */}
               <div className='form-div'>
-                <form className='d-flex flex-column gap-3'>
+                <form className='d-flex flex-column gap-3' onSubmit={handleSubmit(handleSignIn)}>
                     {/* email */}
                     <div className="position-relative">
                     <input
                       type="email"
                       className="rounded-2 ps-5 w-100"
                       placeholder="Email"
+                      {...register("email", { required: true })}
                     />
                     <img
                       src={emailImg}
                       alt=""
                       className="email-input-img position-absolute"
                     />
-                    {/* <p>Lorem ipsum dolor sit amet consectetur.</p> */}
+                      <p className="text-danger fs-6 text-start fw-bold">
+                    {errors.email?.message}
+                    </p>
                   </div>
 
                   {/* password */}
@@ -68,6 +122,7 @@ const SignIn = () => {
                         type={isReveal ? "text" : "password"}
                         className="rounded-2 ps-5 w-100"
                         placeholder="Password"
+                        {...register("password", { required: true })}
                       />
                       <img
                         src={passWordImg}
@@ -83,7 +138,9 @@ const SignIn = () => {
                         {isReveal ? <FiEye /> : <FiEyeOff />}
                       </p>
                     </div>
-                    {/* <p className='text-start mt-2'>Lorem ipsum dolor sit amet consectetur.</p> */}
+                    <p className="text-danger fs-6 text-start fw-bold">
+                    {errors.password?.message}
+                    </p>
                   </div>
                   {/* checkbox */}
                   <div className='d-flex justify-content-between '>
@@ -103,13 +160,12 @@ const SignIn = () => {
                   </div>
 
                   {/* btn */}
-                  <Link className='btn btn-lg btn-primary rounded-pill fw-light' to='/'>
-                    Sign in
-                  </Link>
+                  <button className="btn btn-lg fw-light btn-primary rounded-pill" disabled={isSubmitting}>
+                    {btnText}
+                  </button>
                   {/* have an acc ? */}
                   <span className='d-flex gap-1 '>
                     <span className='fw-light'>
-                      {' '}
                       Dont have an account yet?
                     </span>
                     <Link

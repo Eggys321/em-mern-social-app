@@ -68,7 +68,7 @@ export let people = [
 
   },
   {
-    id: 6,
+    id: 7,
     name: 'Senju Hashirama',
     time: '8 mins ago',
     post: 'Lorem ipsum dolor sit amet consectetur. Morbi lacus neque fermentum vivamus orci. Lorem consectetur neque sit sociis turpis quisque. Auctor ullamcorper quam sit mattis posuere pulvinar molestie dignissim. Pulvinar tincidunt convallis sem congue. Tortor ac suscipit cum.',
@@ -78,7 +78,7 @@ export let people = [
 
   },
   {
-    id: 6,
+    id: 8,
     name: 'Senju Hashirama',
     time: '8 mins ago',
     post: 'Lorem ipsum dolor sit amet consectetur. Morbi lacus neque fermentum vivamus orci. Lorem consectetur neque sit sociis turpis quisque. Auctor ullamcorper quam sit mattis posuere pulvinar molestie dignissim. Pulvinar tincidunt convallis sem congue. Tortor ac suscipit cum.',
@@ -88,7 +88,7 @@ export let people = [
 
   },
   {
-    id: 6,
+    id: 9,
     name: 'Senju Hashirama',
     time: '8 mins ago',
     post: 'Lorem ipsum dolor sit amet consectetur. Morbi lacus neque fermentum vivamus orci. Lorem consectetur neque sit sociis turpis quisque. Auctor ullamcorper quam sit mattis posuere pulvinar molestie dignissim. Pulvinar tincidunt convallis sem congue. Tortor ac suscipit cum.',
@@ -98,7 +98,7 @@ export let people = [
 
   },
   {
-    id: 6,
+    id: 10,
     name: 'Senju Hashirama',
     time: '8 mins ago',
     post: 'Lorem ipsum dolor sit amet consectetur. Morbi lacus neque fermentum vivamus orci. Lorem consectetur neque sit sociis turpis quisque. Auctor ullamcorper quam sit mattis posuere pulvinar molestie dignissim. Pulvinar tincidunt convallis sem congue. Tortor ac suscipit cum.',
@@ -108,7 +108,7 @@ export let people = [
 
   },
   {
-    id: 6,
+    id: 11,
     name: 'Senju Hashirama',
     time: '8 mins ago',
     post: 'Lorem ipsum dolor sit amet consectetur. Morbi lacus neque fermentum vivamus orci. Lorem consectetur neque sit sociis turpis quisque. Auctor ullamcorper quam sit mattis posuere pulvinar molestie dignissim. Pulvinar tincidunt convallis sem congue. Tortor ac suscipit cum.',
@@ -118,7 +118,7 @@ export let people = [
 
   },
   {
-    id: 6,
+    id: 12,
     name: 'Senju Hashirama',
     time: '8 mins ago',
     post: 'Lorem ipsum dolor sit amet consectetur. Morbi lacus neque fermentum vivamus orci. Lorem consectetur neque sit sociis turpis quisque. Auctor ullamcorper quam sit mattis posuere pulvinar molestie dignissim. Pulvinar tincidunt convallis sem congue. Tortor ac suscipit cum.',
@@ -128,7 +128,7 @@ export let people = [
 
   },
   {
-    id: 6,
+    id: 13,
     name: 'Senju Hashirama',
     time: '8 mins ago',
     post: 'Lorem ipsum dolor sit amet consectetur. Morbi lacus neque fermentum vivamus orci. Lorem consectetur neque sit sociis turpis quisque. Auctor ullamcorper quam sit mattis posuere pulvinar molestie dignissim. Pulvinar tincidunt convallis sem congue. Tortor ac suscipit cum.',
@@ -138,7 +138,7 @@ export let people = [
 
   },
   {
-    id: 6,
+    id: 14,
     name: 'Senju Hashirama',
     time: '8 mins ago',
     post: 'Lorem ipsum dolor sit amet consectetur. Morbi lacus neque fermentum vivamus orci. Lorem consectetur neque sit sociis turpis quisque. Auctor ullamcorper quam sit mattis posuere pulvinar molestie dignissim. Pulvinar tincidunt convallis sem congue. Tortor ac suscipit cum.',
@@ -148,7 +148,7 @@ export let people = [
 
   },
   {
-    id: 6,
+    id: 15,
     name: 'Senju Hashirama',
     time: '8 mins ago',
     post: 'Lorem ipsum dolor sit amet consectetur. Morbi lacus neque fermentum vivamus orci. Lorem consectetur neque sit sociis turpis quisque. Auctor ullamcorper quam sit mattis posuere pulvinar molestie dignissim. Pulvinar tincidunt convallis sem congue. Tortor ac suscipit cum.',
@@ -158,7 +158,7 @@ export let people = [
 
   },
   {
-    id: 6,
+    id: 16,
     name: 'Senju Hashirama',
     time: '8 mins ago',
     post: 'Lorem ipsum dolor sit amet consectetur. Morbi lacus neque fermentum vivamus orci. Lorem consectetur neque sit sociis turpis quisque. Auctor ullamcorper quam sit mattis posuere pulvinar molestie dignissim. Pulvinar tincidunt convallis sem congue. Tortor ac suscipit cum.',
