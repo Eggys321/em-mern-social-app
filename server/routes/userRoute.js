@@ -1,5 +1,5 @@
 const express = require("express");
-const { getBioProfile, followUser, unfollowUser, getSingleUser, getAllUsers, searchUsers} = require("../controllers/userController");
+const { getBioProfile, followUser, unfollowUser, getSingleUser, getAllUsers, searchUsers, updateUserProfile} = require("../controllers/userController");
 const router = express.Router();
 const authMiddleware = require("../middleware/auth")
 // search user
@@ -16,6 +16,10 @@ router.get("/userprofile/:userId", getSingleUser);
 
 // all users
 router.get("/all",getAllUsers)
+
+// update user profile
+router.patch('/update-profile', authMiddleware, updateUserProfile);
+
 
 
 

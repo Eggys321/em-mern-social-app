@@ -44,7 +44,7 @@ const userSchema = new Schema({
         default:"user"
     },
     age:{
-        type:Number,
+        type:String,
     },
     gender:{
         type:String,

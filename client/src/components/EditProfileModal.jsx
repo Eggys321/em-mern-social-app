@@ -18,6 +18,13 @@ import { useNavigate } from 'react-router-dom';
 
 function EditProfileModal(props) {
   const [bioProfile,setBioProfile] = useState([]);
+  const [bio,setBio] = useState('');
+  const [age,setAge] = useState('');
+  const [location,setLocation] = useState('');
+  const [gender,setGender] = useState('');
+  const [occupation,setOccupation] = useState('');
+  const [x,setX] = useState('');
+  const [linkedIn,setLinkedIn] = useState('')
 
   const token = localStorage.getItem("clientToken");
   const navigate = useNavigate();
@@ -34,8 +41,21 @@ function EditProfileModal(props) {
       const response = await request.json();
       console.log(response.user);
       setBioProfile(response.user)
+      setBio(response.user.bio);
+      setLocation(response.user.location)
+      setOccupation(response.user.occupation)
     } catch (error) {
       console.log(error.message);
+    }
+  }
+
+  const handleSubmit = async()=>{
+    const formData = new FormData()
+
+    try {
+      
+    } catch (error) {
+      
     }
   }
 
@@ -75,7 +95,7 @@ function EditProfileModal(props) {
           <div className='wrapper   '>
                 <h5 className='mt-3 basic-h5'>Basic Information</h5>
                 {/* form */}
-                <form className='edit-form'>
+                <form className='edit-form' encType="multipart/form-data" onSubmit={handleSubmit}>
                   {/* text area */}
                   <div className='position-relative'>
                     <textarea
@@ -84,6 +104,9 @@ function EditProfileModal(props) {
                       placeholder='Bio'
                       cols='30'
                       rows='5'
+                      value={bio}
+                      onChange={(e) => setBio(e.target.value)}
+
                     ></textarea>
                     <img
                       src={bioImg}
@@ -122,6 +145,9 @@ function EditProfileModal(props) {
                       type='text'
                       className='rounded  utils location-input'
                       placeholder='Location'
+                      value={location}
+                      onChange={(e) => setLocation(e.target.value)}
+
                     />
                     <img
                       src={locationImg}
@@ -136,6 +162,8 @@ function EditProfileModal(props) {
                       type='text'
                       className='rounded  utils occupation-input location-input'
                       placeholder='Occupation'
+                      value={occupation}
+                      onChange={(e) => setOccupation(e.target.value)}
                     />
                     <img
                       src={occupationImg}

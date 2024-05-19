@@ -1,4 +1,6 @@
 const USER = require("../model/userModel");
+const cloudinary = require("cloudinary").v2;
+const fs = require("fs");
 
 // own account
 const getBioProfile = async (req, res) => {
@@ -173,6 +175,75 @@ const searchUsers = async (req, res) => {
   }
 };
 
+const updateUserProfile = async (req, res) => {
+  const { userId } = req.user;
+  const { bio, age, gender, location, occupation, xAccount, linkedinAccount } = req.body;
+  let profilePicture;
+
+  try {
+    console.log("Request files:", req.files); // Log the files from the request
+    console.log("Request body:", req.body); // Log the body from the request
+
+    // Check if a profile picture is uploaded
+    if (req.files && req.files.profilePhoto) {  // Use the correct field name 'profilePhoto'
+      console.log("Profile picture received for upload.");
+
+      // Upload image to Cloudinary with the specified folder
+      const result = await cloudinary.uploader.upload(req.files.profilePhoto.tempFilePath, {
+        folder: 'EM_profilePhoto',
+      });
+
+      console.log("Cloudinary upload result:", result); // Log the Cloudinary result
+
+      // Ensure that the upload was successful
+      if (result && result.secure_url) {
+        profilePicture = result.secure_url;
+        console.log("Profile picture URL:", profilePicture);
+
+        // Remove the uploaded file from the server
+        fs.unlinkSync(req.files.profilePhoto.tempFilePath);
+      } else {
+        console.error('Cloudinary upload failed');
+        return res.status(500).json({ success: false, message: 'Failed to upload image' });
+      }
+    }
+
+    // Prepare updated user data
+    const updatedUserData = {
+      bio,
+      age,
+      gender,
+      location,
+      occupation,
+      x: xAccount,
+      linkedIn: linkedinAccount,
+    };
+
+    if (profilePicture) {
+      updatedUserData.profilePhoto = profilePicture;
+    }
+
+    // Find the user and update the profile
+    const updatedUser = await USER.findByIdAndUpdate(
+      userId,
+      { $set: updatedUserData },
+      { new: true, runValidators: true, context: 'query' }
+    ).select("-password");
+
+    if (!updatedUser) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Profile updated successfully",
+      user: updatedUser,
+    });
+  } catch (error) {
+    console.error('Error updating profile:', error);
+    res.status(500).json({ success: false, message: 'Internal server error', error: error.message });
+  }
+};
 module.exports = {
   getBioProfile,
   followUser,
@@ -180,4 +251,5 @@ module.exports = {
   getSingleUser,
   getAllUsers,
   searchUsers,
+  updateUserProfile
 };

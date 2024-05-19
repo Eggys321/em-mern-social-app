@@ -1,15 +1,17 @@
-import { useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import homeImg from "../assets/home-img.svg";
 import communityImg from "../assets/community-img.svg";
 import profileImg from "../assets/profile-img.svg";
 import searchImg from "../assets/search-img.svg";
 import NavBag from "../components/NavBag";
 import logoImg from "../assets/logo.svg";
+import debounce from 'lodash.debounce'; // Import debounce
+
 import "../styles/Nav.css";
 import { GoChevronDown } from "react-icons/go";
 import { GoChevronUp } from "react-icons/go";
 import ProfileSection from "../components/ProfileSection";
-import { useState } from "react";
+// import { useState } from "react";
 import EditProfileModal from "../components/EditProfileModal";
 import { Link } from "react-router-dom";
 import toast from 'react-hot-toast';
@@ -18,25 +20,98 @@ const Navbar = () => {
   const [modalShow, setModalShow] = useState(false);
   const [bagShow, SetBagShow] = useState(false);
   const [bioProfile,setBioProfile] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
 
   const token = localStorage.getItem("clientToken");
   const navigate = useNavigate();
-  const getBioProfile = async ()=>{
+  const getBioProfile = useCallback(async () => {
     try {
-      
-      const request = await fetch("http://localhost:5782/api/v1/users",{
-        headers:{
-          "Content-type":"application/json",
-          Authorization:`Bearer ${token}`
+      const request = await fetch("http://localhost:5782/api/v1/users", {
+        headers: {
+          "Content-type": "application/json",
+          Authorization: `Bearer ${token}`
         }
-      })
+      });
       const response = await request.json();
-      console.log(response.user);
-      setBioProfile(response.user)
+      setBioProfile(response.user);
     } catch (error) {
       console.log(error.message);
     }
-  }
+  }, [token]);
+  // const getBioProfile = async ()=>{
+  //   try {
+      
+  //     const request = await fetch("http://localhost:5782/api/v1/users",{
+  //       headers:{
+  //         "Content-type":"application/json",
+  //         Authorization:`Bearer ${token}`
+  //       }
+  //     })
+  //     const response = await request.json();
+  //     console.log(response.user);
+  //     setBioProfile(response.user)
+  //   } catch (error) {
+  //     console.log(error.message);
+  //   }
+  // }
+
+  // const handleSearch = useCallback(async (e) => {
+  //   const term = e.target.value;
+  //   setSearchTerm(term);
+  //   if (term) {
+  //     try {
+  //       const request = await fetch(`http://localhost:5782/api/v1/users/search?searchTerm=${term}`, {
+  //         headers: {
+  //           "Content-type": "application/json",
+  //           Authorization: `Bearer ${token}`
+  //         }
+  //       });
+  //       const response = await request.json();
+  //       if (response.success) {
+  //         setSearchResults(response.users);
+  //       } else {
+  //         setSearchResults([]);
+  //       }
+  //     } catch (error) {
+  //       console.log(error.message);
+  //       setSearchResults([]);
+  //     }
+  //   } else {
+  //     setSearchResults([]);
+  //   }
+  // }, [token]);
+  const performSearch = useCallback(async (term) => {
+    if (term) {
+      try {
+        const request = await fetch(`http://localhost:5782/api/v1/users/search?searchTerm=${term}`, {
+          headers: {
+            "Content-type": "application/json",
+            Authorization: `Bearer ${token}`
+          }
+        });
+        const response = await request.json();
+        if (response.success) {
+          setSearchResults(response.users);
+        } else {
+          setSearchResults([]);
+        }
+      } catch (error) {
+        console.log(error.message);
+        setSearchResults([]);
+      }
+    } else {
+      setSearchResults([]);
+    }
+  }, [token]);
+  const debouncedSearch = useCallback(debounce((term) => {
+    performSearch(term);
+  }, 300), [performSearch]);
+  const handleSearch = (e) => {
+    const term = e.target.value;  
+    setSearchTerm(term);
+    debouncedSearch(term);
+  };
   function handleDrop() {
     !bagShow ? SetBagShow(true) : SetBagShow(false);
   }
@@ -66,12 +141,33 @@ const Navbar = () => {
               type="text"
               className="rounded-pill ps-5 search-box "
               placeholder="search"
+              value={searchTerm}
+              onChange={handleSearch}
+
             />
             <img
               src={searchImg}
               alt=""
               className="position-absolute img-fluid search-img"
             />
+             <div>
+             {searchTerm && (
+              <div className="search-results position-absolute z-1 bg-secondary text-white border rounded w-100">
+                {searchResults.length ? (
+                  searchResults.map(user => (
+                    <div key={user._id} className="search-result-item">
+                      <Link className="text-decoration-none text-white" to={`/singleuserprofile/${user._id}`}>
+                            
+                      {user.userName}
+                            </Link>
+                    </div>
+                  ))
+                ) : (
+                  <div className="search-no-results">No results found</div>
+                )}
+              </div>
+            )}
+             </div>
           </div>
         </section>
 
