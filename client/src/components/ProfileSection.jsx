@@ -29,7 +29,7 @@ function ResponsiveExample() {
         }
       })
       const response = await request.json();
-      console.log(response.user);
+      // console.log(response.user);
       setBioProfile(response.user)
     } catch (error) {
       console.log(error.message);

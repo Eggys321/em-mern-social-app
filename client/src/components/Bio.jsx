@@ -23,7 +23,7 @@ const Bio = () => {
         }
       })
       const response = await request.json();
-      console.log(response.user);
+      // console.log(response.user);
       setBioProfile(response.user)
     } catch (error) {
       console.log(error.message);
@@ -86,10 +86,14 @@ const Bio = () => {
                   <span>{bioProfile?.x} </span>
                 </div>
                 <div className='d-flex align-items-center mt-2 gap-2'>
-                  <a href='http://' target='_blank' rel=''>
+                  <a href="" target='_blank' rel=''>
                     <img src={linkedinImg} alt='' />
                   </a>{' '}
-                  <span>{bioProfile?.linkedIn} </span>
+                  <a href={bioProfile?.linkedIn} target='_blank' rel=''>
+                  {/* <span className='' role='button'> </span> */}
+                  {bioProfile?.linkedIn}
+                    {/* <img src={linkedinImg} alt='' /> */}
+                  </a>{' '}
                 </div>
               </div>
               <div>

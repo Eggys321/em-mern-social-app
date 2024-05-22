@@ -25,6 +25,8 @@ const SingleUserProfile = () => {
     };
     useEffect(()=>{
         getData()
+        document.title = "Signup | page";
+
     },[])
   return (
     <>

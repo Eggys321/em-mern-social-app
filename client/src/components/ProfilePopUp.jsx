@@ -3,6 +3,7 @@ import Offcanvas from 'react-bootstrap/Offcanvas';
 import profileImg from '../assets/profile-img.svg';
 import NavBag from './NavBag';
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
 function ProfilePopUp({ name, ...props }) {
   const [show, setShow] = useState(false);
@@ -23,7 +24,7 @@ function ProfilePopUp({ name, ...props }) {
         }
       })
       const response = await request.json();
-      console.log(response.user);
+      // console.log(response.user);
       setBioProfile(response.user)
     } catch (error) {
       console.log(error.message);

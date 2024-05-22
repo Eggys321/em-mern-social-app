@@ -43,7 +43,7 @@ const SignUp = () => {
   console.log(errors);
 
   const onSubmit = async(data) => {
-    console.log(data)
+    // console.log(data)
     setIsClicked(true)
     try {
       setSuccessMsg('');
@@ -56,7 +56,7 @@ const SignUp = () => {
         body:JSON.stringify(data)
       })
       const res = await req.json();
-      console.log(res);
+      // console.log(res);
       if(!res.success){
         const errorData = await res;
         setServerError(errorData.message)

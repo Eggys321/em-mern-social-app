@@ -174,26 +174,23 @@ const searchUsers = async (req, res) => {
     res.status(500).json(error.message);
   }
 };
-
+// update user profile ftn
 const updateUserProfile = async (req, res) => {
   const { userId } = req.user;
-  const { bio, age, gender, location, occupation, xAccount, linkedinAccount } = req.body;
+  const { bio, age, gender, location, occupation, x, linkedIn } = req.body;
   let profilePicture;
 
   try {
-    console.log("Request files:", req.files); // Log the files from the request
-    console.log("Request body:", req.body); // Log the body from the request
+    // console.log("Request files:", req.files); // Log the files from the request
+    // console.log("Request body:", req.body); // Log the body from the request
 
     // Check if a profile picture is uploaded
-    if (req.files && req.files.profilePhoto) {  // Use the correct field name 'profilePhoto'
-      console.log("Profile picture received for upload.");
+    if (req.files && req.files.profilePhoto) {  
 
       // Upload image to Cloudinary with the specified folder
       const result = await cloudinary.uploader.upload(req.files.profilePhoto.tempFilePath, {
         folder: 'EM_profilePhoto',
       });
-
-      console.log("Cloudinary upload result:", result); // Log the Cloudinary result
 
       // Ensure that the upload was successful
       if (result && result.secure_url) {
@@ -215,8 +212,8 @@ const updateUserProfile = async (req, res) => {
       gender,
       location,
       occupation,
-      x: xAccount,
-      linkedIn: linkedinAccount,
+      x,
+      linkedIn,
     };
 
     if (profilePicture) {

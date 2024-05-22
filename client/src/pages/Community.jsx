@@ -14,6 +14,8 @@ const Community = () => {
   };
   useEffect(() => {
     getUsers();
+    document.title = "community | page";
+
   }, []);
   return (
     <>

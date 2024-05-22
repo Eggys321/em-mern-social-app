@@ -39,7 +39,7 @@ const navigate = useNavigate()
   });
 
   const handleSignIn = async(data)=>{
-    console.log(data);
+    // console.log(data);
     setIsClicked(true)
 
     try {
@@ -51,7 +51,7 @@ const navigate = useNavigate()
         body:JSON.stringify(data)
       })
       const response = await request.json();
-      console.log(response);
+      // console.log(response);
       if(!response.success){
         toast.error(response.message)
       }

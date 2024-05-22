@@ -15,7 +15,7 @@ router.post("/unfollow/:followersId",authMiddleware,unfollowUser);
 router.get("/userprofile/:userId", getSingleUser);
 
 // all users
-router.get("/all",getAllUsers)
+router.get("/all",getAllUsers);
 
 // update user profile
 router.patch('/update-profile', authMiddleware, updateUserProfile);

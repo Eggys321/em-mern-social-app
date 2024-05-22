@@ -2,10 +2,15 @@ import { useState } from "react";
 import editImg from "../assets/edit-img.svg";
 import notImg from "../assets/notification-img.svg";
 import logOutImg from "../assets/logout-img.svg";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import EditProfileModal from "./EditProfileModal";
 const NavBag = () => {
   const [modalShow, setModalShow] = useState(false);
+  const navigate = useNavigate()
+  const logOut = ()=>{
+    localStorage.removeItem("clientToken")
+    navigate("/signin")
+  }
 
   return (
     <>
@@ -48,7 +53,7 @@ const NavBag = () => {
             <Link to="#">
               <img src={logOutImg} alt="" />
             </Link>
-            <span className="">Log Out</span>
+            <span role="button" className="" onClick={logOut}>Log Out</span>
           </div>
           <hr />
         </div>

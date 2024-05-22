@@ -2,7 +2,6 @@ import { useState,useEffect } from 'react';
 import NavSection from '../components/NavSection';
 import Navbar from '../layouts/Navbar';
 import profileImg from '../assets/profile-img.svg';
-
 import '../styles/Home.css';
 import Post from '../components/Post';
 import { people } from '../db';
@@ -16,7 +15,7 @@ import Bio from '../components/Bio';
 const Home = () => {
   const [modalShow, setModalShow] = useState(false);
   const [bioProfile,setBioProfile] = useState([])
-  console.log(people);
+  // console.log(people);
   const navigate = useNavigate()
   const token = localStorage.getItem("clientToken");
 
@@ -30,7 +29,7 @@ const Home = () => {
         }
       })
       const response = await request.json();
-      console.log(response.user);
+      // console.log(response.user);
       setBioProfile(response.user)
     } catch (error) {
       console.log(error.message);
@@ -43,6 +42,8 @@ const Home = () => {
           navigate('/signin');
       }
       getBioProfile()
+      document.title = "Home | page";
+
   },[])
 
   return (
