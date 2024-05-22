@@ -8,6 +8,7 @@ import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 
 const Bio = () => {
+  
     const [bioProfile,setBioProfile] = useState([]);
 
     const token = localStorage.getItem("clientToken");
