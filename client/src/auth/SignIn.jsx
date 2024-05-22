@@ -43,7 +43,7 @@ const navigate = useNavigate()
     setIsClicked(true)
 
     try {
-      const request = await fetch("http://localhost:5782/api/v1/auth/login",{
+      const request = await fetch("https://em-mern-social-app.onrender.com/api/v1/auth/login",{
         method:"POST",
         headers:{
           "Content-Type":"application/json"

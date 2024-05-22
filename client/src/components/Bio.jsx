@@ -16,7 +16,7 @@ const Bio = () => {
   const getBioProfile = async ()=>{
     try {
       
-      const request = await fetch("http://localhost:5782/api/v1/users",{
+      const request = await fetch("https://em-mern-social-app.onrender.com/api/v1/users",{
         headers:{
           "Content-type":"application/json",
           Authorization:`Bearer ${token}`
