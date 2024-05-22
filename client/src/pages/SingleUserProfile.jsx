@@ -18,7 +18,7 @@ const SingleUserProfile = () => {
     const {userId} = useParams();
     console.log(userId);
     const getData = async()=>{
-        const request = await fetch(`https://em-mern-social-app.onrender.com/v1/users/userprofile/${userId}`);
+        const request = await fetch(`https://em-mern-social-app.onrender.com/api/v1/users/userprofile/${userId}`);
         const response = await request.json();
         console.log(response.user);
         setData(response.user)
