@@ -1,44 +1,72 @@
-import { useState } from 'react';
-// import Button from 'react-bootstrap/Button';
-import Modal from 'react-bootstrap/Modal';
-import galleryImg from '../assets/gallery.svg';
-import FloatingLabel from 'react-bootstrap/FloatingLabel';
-import Form from 'react-bootstrap/Form';
-import roadImg from '../assets/Road-img.svg';
-import cityImg from '../assets/city-img.svg';
-import teaImg from '../assets/tea-img.svg';
+import { useState } from "react";
+import Modal from "react-bootstrap/Modal";
+import galleryImg from "../assets/gallery.svg";
+import FloatingLabel from "react-bootstrap/FloatingLabel";
+import Form from "react-bootstrap/Form";
+import roadImg from "../assets/Road-img.svg";
+import cityImg from "../assets/city-img.svg";
+import teaImg from "../assets/tea-img.svg";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useForm } from "react-hook-form";
+import { postText } from "../utils/ValidationSchema";
 function Post() {
   const [show, setShow] = useState(false);
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
 
+  const {
+    register,
+    handleSubmit,
+    formState: { errors,isSubmitting},
+  } = useForm({
+    resolver:yupResolver(postText),
+    defaultValues:{
+      email:"",
+      password:""
+    }
+  });
+
+  const handlePost = async(data)=>{
+
+    try {
+      
+    } catch (error) {
+      
+    }
+
+  }
+
   return (
     <>
-      <div className='d-flex align-items-center'>
-        <img src={galleryImg} alt='' onClick={handleShow} role='button' />{' '}
+      <div className="d-flex align-items-center">
+        <img src={galleryImg} alt="" onClick={handleShow} role="button" />{" "}
         <span>Image</span>
       </div>
 
       <Modal show={show} onHide={handleClose}>
-        <Modal.Body>
-          {/* write post input */}
+        <form onSubmit={handleSubmit(handlePost)}>
+          <Modal.Body>
+            {/* write post input */}
 
-          <FloatingLabel
-            controlId='floatingTextarea'
-            label='Write post'
-            className='mb-3'
-          >
-            <Form.Control
-              style={{ height: '15rem' }}
-              as='textarea'
-              placeholder='Leave a comment here'
-            />
-          </FloatingLabel>
+            <FloatingLabel
+              controlId="floatingTextarea"
+              label="Write post"
+              className="mb-3"
+            >
+              <Form.Control
+                style={{ height: "15rem" }}
+                as="textarea"
+                placeholder="Leave a comment here"
+              />
+            </FloatingLabel>
+            <Form.Group controlId="formFileLg" className="mb-3">
+              <Form.Control type="file" size="lg" />
+            </Form.Group>
 
-          {/* images */}
-          <section className='d-flex  justify-content-between gap-3'>
-            <div>
+            {/* images */}
+            <section className="d-flex  justify-content-between gap-3">
+              {/* <div>
               <img src={roadImg} alt='' className='img-fluid' />
             </div>
 
@@ -48,23 +76,18 @@ function Post() {
 
             <div>
               <img src={teaImg} alt='' className='img-fluid' />
+            </div> */}
+            </section>
+            <div className="text-end">
+              <button
+                type="button"
+                className="btn mt-3  px-4 rounded-pill btn-primary btn-sm"
+              >
+                post
+              </button>
             </div>
-          </section>
-          <div className='text-end'>
-          <button type="button" className="btn mt-3  px-4 rounded-pill btn-primary btn-sm">post</button>
-
-          </div>
-
-          {/* post btn */}
-        </Modal.Body>
-        {/* <Modal.Footer> */}
-        {/* <Button variant='secondary' onClick={handleClose}>
-            Close
-          </Button> */}
-        {/* <Button variant='primary'>
-            post
-          </Button>
-        </Modal.Footer>  */}
+          </Modal.Body>
+        </form>
       </Modal>
     </>
   );

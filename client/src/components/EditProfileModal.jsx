@@ -14,7 +14,7 @@ import xImg from "../assets/twitter-input-img.svg";
 import linkedinImg from "../assets/linkedin-input-img.svg";
 import "../styles/EditProfile.css";
 import { useNavigate } from "react-router-dom";
-import Loader from "../utils/Loader";
+import {Loader} from "../utils/Loader";
 import toast from "react-hot-toast";
 
 function EditProfileModal(props) {

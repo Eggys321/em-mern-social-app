@@ -15,6 +15,17 @@
 .post-input{
   height: 2rem;
 }
+.home-post-error-state{
+  min-width: 50%;
+}
+
+
+
+@media(max-width:431px){
+  .home-post-error-state{
+    min-width: 70%;
+  }
+}
 
 /* .home-main{
   

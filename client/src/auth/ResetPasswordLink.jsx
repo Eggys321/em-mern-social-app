@@ -1,29 +1,25 @@
 import loginImg from "../assets/login-img.svg";
 import logoImg from "../assets/logo.svg";
-import userImg from "../assets/user-name.svg";
-// import FloatingLabel from 'react-bootstrap/FloatingLabel';
-// import Form from 'react-bootstrap/Form';
 import { useEffect, useState } from "react";
 import { FiEye } from "react-icons/fi";
 import { FiEyeOff } from "react-icons/fi";
-import { Link,useNavigate} from "react-router-dom";
-import emailImg from "../assets/email-img.svg";
+import { Link,useNavigate,useParams} from "react-router-dom";
 import passWordImg from "../assets/password-img.svg";
-// import { Link } from 'react-router-dom';
 import "../styles/SignUp.css";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import  {regFormSchema} from '../utils/ValidationSchema';
+import  {resetPwdLinkSchema} from '../utils/ValidationSchema';
 import toast from "react-hot-toast";
 import {Loader} from "../utils/Loader";
 
 
-const SignUp = () => {
+const ResetPasswordLink = () => {
   const [isReveal, setReveal] = useState(false);
   const [isReveal2, setReveal2] = useState(false);
-  const [serverError,setServerError] = useState("");
-  const [successMsg, setSuccessMsg] = useState("");
   const [isCLicked,setIsClicked] = useState(false);
+
+  const { resetToken } = useParams();
+
 
   const navigate = useNavigate();
   const {
@@ -31,10 +27,8 @@ const SignUp = () => {
     handleSubmit,
     formState: { errors,isSubmitting},
   } = useForm({
-    resolver:yupResolver(regFormSchema),
+    resolver:yupResolver(resetPwdLinkSchema),
     defaultValues:{
-      userName:"",
-      email:"",
       password:"",
       confirmPassword:""
     }
@@ -46,10 +40,9 @@ const SignUp = () => {
     // console.log(data)
     setIsClicked(true)
     try {
-      setSuccessMsg('');
-      setServerError("")
-      const req = await fetch("https://em-mern-social-app.onrender.com/api/v1/auth/register",{
-        method:"POST",
+      
+      const req = await fetch(`https://em-mern-social-app.onrender.com/api/v1/auth/resetpassword/${resetToken}`,{
+        method:"PUT",
         headers:{
           "Content-Type":"application/json"
         },
@@ -59,12 +52,10 @@ const SignUp = () => {
       // console.log(res);
       if(!res.success){
         const errorData = await res;
-        setServerError(errorData.message)
         toast.error(errorData.message)
         setIsClicked(true)
       }
       if(res.success){
-        setSuccessMsg(res.message)
         toast.success(res.message)
         navigate('/signin')
       }
@@ -75,7 +66,7 @@ const SignUp = () => {
       setIsClicked(false)
     }
   };
-const btnText = isCLicked ? <Loader/> : "Sign Up";
+const btnText = isCLicked ? <Loader/> : "Reset Password";
   function handleToggle() {
     !isReveal ? setReveal(true) : setReveal(false);
   }
@@ -85,7 +76,7 @@ const btnText = isCLicked ? <Loader/> : "Sign Up";
   }
 
   useEffect(() => {
-    document.title = "Signup | page";
+    document.title = "Reset-password-link | page";
   });
   return (
     <>
@@ -105,7 +96,7 @@ const btnText = isCLicked ? <Loader/> : "Sign Up";
               <div>
                 <img src={logoImg} alt="" />
                 <h3 className="fw-bold">Welcome back to EM</h3>
-                <p className="fw-bold">Sign up for free</p>
+                <p className="fw-bold">Reset Password</p>
               </div>
 
               {/* form div */}
@@ -114,44 +105,6 @@ const btnText = isCLicked ? <Loader/> : "Sign Up";
                   onSubmit={handleSubmit(onSubmit)}
                   className="d-flex flex-column gap-3"
                 >
-                  {/* email */}
-                  <div className="position-relative">
-                    <input
-                      type="email"
-                      className="rounded-2 ps-5 w-100"
-                      placeholder="Email"
-                      {...register("email", { required: true })}
-                    />
-                    <img
-                      src={emailImg}
-                      alt=""
-                      className="email-input-img position-absolute"
-                    />
-                    <p className="text-danger fs-6 text-start fw-bold">
-                    {errors.email?.message}
-                    </p>
-                  </div>
-                  {/* username */}
-                  <div>
-                    <div className="position-relative">
-                      <input
-                        type="text"
-                        className="rounded-2 ps-5 w-100"
-                        placeholder="Username"
-                        {...register("userName", { required: true })}
-                      />
-                      <img
-                        src={userImg}
-                        alt=""
-                        className="user-input-img position-absolute  start-0 bottom-0 translate-middle-y ms-3"
-                      />
-                    </div>
-                       <p className="text-danger fs-6 text-start fw-bold">
-                    {errors.userName?.message}
-                    </p>
-                    {/* <p>Lorem ipsum dolor sit amet consectetur.</p> */}
-                  </div>
-
                   {/* password */}
                   <div className="">
                     <div className="position-relative">
@@ -178,7 +131,6 @@ const btnText = isCLicked ? <Loader/> : "Sign Up";
                     <p className="text-danger fs-6 text-start fw-bold">
                     {errors.password?.message}
                     </p>
-                    {/* <p>Lorem ipsum dolor sit amet consectetur.</p> */}
                   </div>
 
                   {/* confirm password */}
@@ -207,32 +159,12 @@ const btnText = isCLicked ? <Loader/> : "Sign Up";
                     <p className="text-danger fs-6 text-start fw-bold">
                     {errors.confirmPassword?.message}
                     </p>
-                    {/* <p>Lorem ipsum dolor sit amet consectetur.</p> */}
                   </div>
-
-                  {/* {serverError && <p className="text-danger"> {serverError} </p> }
-                  {successMsg && <p className="text-success"> {successMsg} </p> } */}
 
                   {/* button */}
                   <button className="btn btn-lg fw-light btn-primary rounded-pill" disabled={isSubmitting}>
                     {btnText}
                   </button>
-
-                  {/* have account ? */}
-                  <span className="d-flex gap-1 ">
-                    <span className="fw-light"> Already have an account?</span>
-                    <Link
-                      to="/signin"
-                      className="text-decoration-none fw-bolder"
-                    >
-                      Sign in
-                    </Link>
-                  </span>
-                  <p className="fw-light">
-                    By signing up you accept our Privacy Policy, Terms &
-                    Licensing Agreement. Protected by reCAPTCHA. Google Privacy
-                    Policy & Terms apply.
-                  </p>
                 </form>
               </div>
             </div>
@@ -243,4 +175,4 @@ const btnText = isCLicked ? <Loader/> : "Sign Up";
   );
 };
 
-export default SignUp;
+export default ResetPasswordLink;

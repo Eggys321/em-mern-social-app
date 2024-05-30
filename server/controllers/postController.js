@@ -68,12 +68,13 @@ const getTimeline = async (req,res)=>{
 
 // like and unlike post
 const likePost = async(req,res)=>{
-    const {userId} = req.user
+    const {userId} = req.user;
     try {
         const post = await POST.findById(req.params.postId);
         if (!post) {
           return res.status(404).json({ error: 'Post not found.' });
         }
+        
         // ================ 1 ======================================
         // if (post.likes.includes(userId)) {
         //   post.likes.pull(userId);
@@ -944,7 +945,7 @@ const getComments = async(req,res)=>{
   }
 }
 
-// get all tasks by a user
+// get all posts by a user
 const getPostsByUser = async(req,res)=>{
   const {userId} = req.user
 
@@ -956,43 +957,43 @@ const getPostsByUser = async(req,res)=>{
   }
 }
 // Delete a comment
-const deleteComment = async (req, res) => {
-  try {
-    const postId = req.params.postId;
-    const commentId = req.params.commentId;
-    const userId = req.user.userId;
+// const deleteComment = async (req, res) => {
+//   try {
+//     const postId = req.params.postId;
+//     const commentId = req.params.commentId;
+//     const userId = req.user.userId;
 
-    // Find the post by ID
-    const post = await POST.findById(postId);
+//     // Find the post by ID
+//     const post = await POST.findById(postId);
 
-    // Check if the post exists
-    if (!post) {
-      return res.status(404).json({success:false, message: 'Post not found.' });
-    }
+//     // Check if the post exists
+//     if (!post) {
+//       return res.status(404).json({success:false, message: 'Post not found.' });
+//     }
 
-    // Find the comment by ID
-    const comment = post.comments.find(comment => comment._id.toString() === commentId);
+//     // Find the comment by ID
+//     const comment = post.comments.find(comment => comment._id.toString() === commentId);
 
-    // Check if the comment exists
-    if (!comment) {
-      return res.status(404).json({success:false, message: 'Comment not found.' });
-    }
+//     // Check if the comment exists
+//     if (!comment) {
+//       return res.status(404).json({success:false, message: 'Comment not found.' });
+//     }
 
-    // Check if the user is the owner of the comment
-    if (comment.user.toString() !== userId) {
-      return res.status(403).json({success:false, message: 'You do not have permission to delete this comment.' });
-    }
+//     // Check if the user is the owner of the comment
+//     if (comment.user.toString() !== userId) {
+//       return res.status(403).json({success:false, message: 'You do not have permission to delete this comment.' });
+//     }
 
-    // Delete the comment
-    post.comments = post.comments.filter(comment => comment._id.toString() !== commentId);
-    await post.save();
+//     // Delete the comment
+//     post.comments = post.comments.filter(comment => comment._id.toString() !== commentId);
+//     await post.save();
 
-    res.status(200).json({ success: true, message: 'Comment deleted successfully.' });
-  } catch (error) {
-    // console.error('Error deleting comment:', error);
-    res.status(500).json(error.message);
-  }
-};
+//     res.status(200).json({ success: true, message: 'Comment deleted successfully.' });
+//   } catch (error) {
+//     // console.error('Error deleting comment:', error);
+//     res.status(500).json(error.message);
+//   }
+// };
 
 // Edit a comment
 // const editComment = async (req, res) => {

@@ -10,7 +10,7 @@ import passWordImg from '../assets/password-img.svg';
 import { Link,useNavigate } from 'react-router-dom';
 import '../styles/SignIn.css';
 import { useForm } from "react-hook-form";
-import Loader from "../utils/Loader";
+import {Loader} from "../utils/Loader";
 import { signInSchema } from '../utils/ValidationSchema';
 import { yupResolver } from "@hookform/resolvers/yup";
 import toast from 'react-hot-toast';

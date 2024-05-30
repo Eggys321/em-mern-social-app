@@ -7,6 +7,7 @@ import Home from './pages/Home.jsx';
 import { Toaster } from 'react-hot-toast';
 import Community from './pages/Community.jsx';
 import SingleUserProfile from './pages/SingleUserProfile.jsx';
+import ResetPasswordLink from './auth/ResetPasswordLink.jsx';
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
           <Route path='/community' element={<Community/>}/>
           <Route path='/resetpassword' element={<ResetPassword />}/>
           <Route path='/singleuserprofile/:userId'  element={<SingleUserProfile/>} />
+          <Route path='/resetpasswordlink/:resetToken' element={<ResetPasswordLink/>} />
         </Routes>
       </BrowserRouter>
       <Toaster/>

@@ -106,14 +106,16 @@ const Navbar = () => {
             <input
               type="text"
               className="rounded-pill ps-5 search-box"
-              placeholder="search"
+              placeholder="search a user name"
               value={searchTerm}
               onChange={handleSearch}
             />
             <img
+            loading="lazy"
               src={searchImg}
               alt=""
               className="position-absolute img-fluid search-img"
+
             />
             <div>
               {searchTerm && (

@@ -25,7 +25,7 @@ const SingleUserProfile = () => {
     };
     useEffect(()=>{
         getData()
-        document.title = "Signup | page";
+        document.title = "user | profile";
 
     },[])
   return (
@@ -59,7 +59,7 @@ const SingleUserProfile = () => {
                 <div>
                   <h4>Activities</h4>
                   <div className='d-flex align-items-center gap-2'>
-                    <img src={followersImg} alt='' /> <span> {data?.followers?.length} Followers </span>
+                    <img src={followersImg} alt='' /> <span> {data?.followers?.length} Follower(s) </span>
                   </div>
                   <div className='d-flex align-items-center mt-2 gap-2'>
                     <img src={followingImg} alt='' /> <span>{data?.following?.length} Following</span>

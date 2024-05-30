@@ -130,8 +130,8 @@ const forgotPassword = async (req, res,next) => {
       }
       const resetToken = user.getResetPasswordToken();
       await user.save();
-      const resetUrl = `http://localhost:5173/resetpassword/${resetToken}`;
-      const message = `<h1>You have requested for a password reset </h1> <p>Please go to this link to reset your password</p> <a href=${resetUrl} clicktracking = off> ${resetUrl} </a> `;
+      const resetUrl = `https://em-mern-social-app.vercel.app/resetpasswordlink/${resetToken}`;
+      const message = `<h1>You have requested for a password reset from EM_App </h1> <p>Please go to this link to reset your password</p> <a href=${resetUrl} clicktracking = off> ${resetUrl} </a> `;
       try {
         await sendEmail({
           to: user.email,

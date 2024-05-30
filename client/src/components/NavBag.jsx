@@ -16,7 +16,7 @@ const NavBag = () => {
     <>
       <EditProfileModal show={modalShow} onHide={() => setModalShow(false)} />
 
-      <section className="bg-gradient-secondary rounded-2 border p-2 shadow-lg">
+      <section className="bg-gradient-secondary rounded-2 border p-2 shadow-lg ">
         {/* Edit */}
         <div className="mb-4">
           <div

@@ -1,115 +1,183 @@
-import { useState,useEffect } from 'react';
-import NavSection from '../components/NavSection';
-import Navbar from '../layouts/Navbar';
-import profileImg from '../assets/profile-img.svg';
-import '../styles/Home.css';
-import Post from '../components/Post';
-import { people } from '../db';
-import commentImg from '../assets/comment-image.svg';
-import likeImg from '../assets/like-img.svg';
-import shareImg from '../assets/share-img.svg';
-import CommentModal from '../components/ComentModal';
-import { useNavigate } from 'react-router-dom';
-import toast from 'react-hot-toast';
-import Bio from '../components/Bio';
+import { useState, useEffect } from "react";
+import NavSection from "../components/NavSection";
+import Navbar from "../layouts/Navbar";
+import profileImg from "../assets/profile-img.svg";
+import "../styles/Home.css";
+import Post from "../components/Post";
+import { people } from "../db";
+import commentImg from "../assets/comment-image.svg";
+import likeImg from "../assets/like-img.svg";
+import shareImg from "../assets/share-img.svg";
+import CommentModal from "../components/ComentModal";
+import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
+import Bio from "../components/Bio";
+import { postText } from "../utils/ValidationSchema";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useForm } from "react-hook-form";
+
 const Home = () => {
   const [modalShow, setModalShow] = useState(false);
-  const [bioProfile,setBioProfile] = useState([])
+  const [bioProfile, setBioProfile] = useState([]);
   // console.log(people);
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const token = localStorage.getItem("clientToken");
 
-  const getBioProfile = async ()=>{
+  const getBioProfile = async () => {
     try {
-      
-      const request = await fetch("https://em-mern-social-app.onrender.com/api/v1/users",{
-        headers:{
-          "Content-type":"application/json",
-          Authorization:`Bearer ${token}`
+      const request = await fetch(
+        "https://em-mern-social-app.onrender.com/api/v1/users",
+        {
+          headers: {
+            "Content-type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
         }
-      })
+      );
       const response = await request.json();
       // console.log(response.user);
-      setBioProfile(response.user)
+      setBioProfile(response.user);
     } catch (error) {
       console.log(error.message);
     }
-  }
+  };
 
-  useEffect(()=>{
-      if(!token){
-        toast.error("unauthorized,sign in")
-          navigate('/signin');
+  // for the post
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm({
+    resolver: yupResolver(postText),
+    defaultValues: {
+      text: "",
+    },
+  });
+  // console.log("errors", errors);
+
+  const handlePost = async (data) => {
+    // console.log(data);
+    // setIsClicked(true)
+    // console.log(data);
+
+    try {
+      const request = await fetch(
+        "https://em-mern-social-app.onrender.com/api/v1/posts/create-post",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(data),
+        }
+      );
+      const response = await request.json();
+      console.log(response);
+      if (response.success) {
+        reset();
+        toast.success(response.message);
       }
-      getBioProfile()
-      document.title = "Home | page";
+    } catch (error) {
+      console.log(error);
+    } finally {
+    }
+  };
 
-  },[])
+  useEffect(() => {
+    if (!token) {
+      toast.error("unauthorized,sign in");
+      navigate("/signin");
+    }
+    getBioProfile();
+    document.title = "Home | page";
+  }, []);
 
   return (
     <>
       {/* nav */}
       <Navbar />
-      
 
       {/* main content */}
-      <div className='home-wrapper'>
-        <div className='container'>
-          <main className=' row home-main gap-2 pt-3'>
-          <section className='vh-100 col-lg-4 d-none d-lg-block p-2 rounded-2 border profile-section '>
-
-            <Bio/>
+      <div className="home-wrapper">
+        <div className="container">
+          <main className=" row home-main gap-2 pt-3">
+            <section className="vh-100 col-lg-4 d-none d-lg-block p-2 rounded-2 border profile-section ">
+              <Bio />
             </section>
 
             {/* news-field col */}
 
-            <section className='col-lg'>
+            <section className="col-lg">
               {/* top div */}
-              <div className='p-2 top-news-field rounded-2 mb-2 border'>
+              <div className="p-2 top-news-field rounded-2 mb-2 border ">
                 {/*  */}
-                <div className='d-flex gap-2 align-items-center'>
-                <img src={bioProfile?.profilePhoto} alt='' className='profile-img '  style={{borderRadius:"5rem", height:"4rem",width:"4rem"}}/>
-                  <input
-                    type='text'
-                    className='rounded-pill ps-2 post-input w-100'
-                    placeholder='What do you want to ask or share?'
-                  />
-                </div>
+                <form onSubmit={handleSubmit(handlePost)} className="w-100">
+                  <div className="d-flex gap-2 align-items-center">
+                    <img
+                      src={bioProfile?.profilePhoto}
+                      alt=""
+                      className="profile-img "
+                      style={{
+                        borderRadius: "5rem",
+                        height: "4rem",
+                        width: "4rem",
+                      }}
+                    />
 
-                {/*  */}
-                <div className=' d-flex align-items-center justify-content-between mt-2'>
-                  <Post />
-                  <button className='btn btn-sm btn-primary text-light px-4 rounded-pill'>
-                    {' '}
-                    post
-                  </button>
-                </div>
+                    <input
+                      type="text"
+                      className="rounded-pill ps-2 post-input w-100"
+                      placeholder="What do you want to ask or share?"
+                      {...register("text", { required: true })}
+                    />
+                  </div>
+                  {/*  */}
+                  <div className=" d-flex align-items-center justify-content-between mt-1">
+                 <div className="d-flex justify-content-between home-post-error-state align-items-center">
+                    <Post />
+                 <div >
+                 <span className="text-danger   fs-6 text-start fw-bold">
+                    {errors.text?.message}
+                  </span>
+                 </div>
+
+                 </div>
+                    <button
+                      className="btn btn-sm btn-primary text-light px-4 rounded-pill"
+                      disabled={isSubmitting}
+                    >
+                      post
+                    </button>
+                  </div>
+                </form>
               </div>
 
               <div>
-              <CommentModal show={modalShow} onHide={() => setModalShow(false)} />
+                <CommentModal
+                  show={modalShow}
+                  onHide={() => setModalShow(false)}
+                />
                 {people.map((person) => {
                   const { id, name, time, post, profileImg, postImg, follow } =
                     person;
                   return (
-                    <div
-                      key={id}
-                      className='p-2 mb-3 rounded-2 scroll-page'
-                    >
+                    <div key={id} className="p-2 mb-3 rounded-2 scroll-page">
                       {/* top div */}
-                      <div className='d-flex justify-content-between align-items-center '>
+                      <div className="d-flex justify-content-between align-items-center ">
                         {/* img and time */}
-                        <div className='d-flex gap-2 align-items-center'>
-                          <img src={profileImg} alt='' className='' />
-                          <span className='d-flex flex-column justify-content-center '>
-                            <h5 className='pt-3'>{name}</h5>
+                        <div className="d-flex gap-2 align-items-center">
+                          <img src={profileImg} alt="" className="" />
+                          <span className="d-flex flex-column justify-content-center ">
+                            <h5 className="pt-3">{name}</h5>
                             <p>{time}</p>
                           </span>
                         </div>
 
                         {/* btn-div */}
                         <div>
-                          <button className='btn btn-white btn-sm rounded-pill border px-2'>
+                          <button className="btn btn-white btn-sm rounded-pill border px-2">
                             {follow}
                           </button>
                         </div>
@@ -119,24 +187,26 @@ const Home = () => {
                       <p>{post}</p>
 
                       {/* post-img */}
-                      <img src={postImg} className='w-100' alt='' />
+                      <img src={postImg} className="w-100" alt="" />
 
                       {/* reactions */}
-                      <main className='d-flex pt-2 justify-content-between align-items-center'>
+                      <main className="d-flex pt-2 justify-content-between align-items-center">
                         {/* like and comment */}
 
-                        <div className='d-flex gap-2'>
-                          <img src={likeImg} alt='' role='button' />
-                          <div show={modalShow} onClick={() => setModalShow(true)}>
+                        <div className="d-flex gap-2">
+                          <img src={likeImg} alt="" role="button" />
+                          <div
+                            show={modalShow}
+                            onClick={() => setModalShow(true)}
+                          >
+                            <img src={commentImg} alt="" role="button" />
+                          </div>
+                        </div>
 
-                          <img src={commentImg} alt=''  role='button'/>
-                          </div>
-                          </div>
-      
-                          {/* share */}
-                          <div>
-                            <img src={shareImg} alt=''  role='button' />
-                          </div>
+                        {/* share */}
+                        <div>
+                          <img src={shareImg} alt="" role="button" />
+                        </div>
                       </main>
                     </div>
                   );
