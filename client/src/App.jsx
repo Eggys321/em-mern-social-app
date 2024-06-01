@@ -12,7 +12,7 @@ import ResetPasswordLink from './auth/ResetPasswordLink.jsx';
 function App() {
   return (
     <>
-      <BrowserRouter>
+      
         <Routes>
           <Route path='/' element={<Home />}/>
           <Route path='/signin' element={<SignIn />}/>
@@ -22,7 +22,7 @@ function App() {
           <Route path='/singleuserprofile/:userId'  element={<SingleUserProfile/>} />
           <Route path='/resetpasswordlink/:resetToken' element={<ResetPasswordLink/>} />
         </Routes>
-      </BrowserRouter>
+      
       <Toaster/>
 
     </>

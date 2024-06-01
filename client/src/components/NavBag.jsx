@@ -1,16 +1,18 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import editImg from "../assets/edit-img.svg";
 import notImg from "../assets/notification-img.svg";
 import logOutImg from "../assets/logout-img.svg";
 import { Link, useNavigate } from "react-router-dom";
 import EditProfileModal from "./EditProfileModal";
+import UserContext from "../context/UserContext";
 const NavBag = () => {
   const [modalShow, setModalShow] = useState(false);
+  const {logOut} = useContext(UserContext)
   const navigate = useNavigate()
-  const logOut = ()=>{
-    localStorage.removeItem("clientToken")
-    navigate("/signin")
-  }
+  // const logOut = ()=>{
+  //   localStorage.removeItem("clientToken")
+  //   navigate("/signin")
+  // }
 
   return (
     <>

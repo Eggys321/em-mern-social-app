@@ -20,7 +20,7 @@ const SingleUserProfile = () => {
     const getData = async()=>{
         const request = await fetch(`https://em-mern-social-app.onrender.com/api/v1/users/userprofile/${userId}`);
         const response = await request.json();
-        console.log(response.user);
+        // console.log(response.user);
         setData(response.user)
     };
     useEffect(()=>{

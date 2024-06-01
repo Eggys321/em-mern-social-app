@@ -20,7 +20,7 @@ const Community = () => {
         "https://em-mern-social-app.onrender.com/api/v1/users/all"
       );
       const response = await request.json();
-      console.log(response.users);
+      // console.log(response.users);
       setData(response.users);
     } catch (error) {
     } finally {
@@ -40,7 +40,7 @@ const Community = () => {
         }
       );
       const response = await request.json();
-      console.log(response);
+      // console.log(response);
       if (response.success) {
         setCurrentUser(response.user);
       } else {

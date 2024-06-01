@@ -67,23 +67,88 @@ export const postText = yup
   })
   .required();
 // post text or image
-export const postTextImg = yup
-  .object({
-    text: yup.string().when("image", {
-      is: (image) => !image || image.length === 0,
-      then: yup.string().required("Either text or image is required"),
-      otherwise: yup.string(),
+// export const postTextImg = yup
+//   .object({
+//     text: yup.string().when("image", {
+//       is: (image) => !image || image.length === 0,
+//       then: yup.string().required("Either text or image is required"),
+//       otherwise: yup.string(),
+//     }),
+//     img: yup.mixed().when("text", {
+//       is: (text) => !text,
+//       then: yup
+//         .mixed()
+//         .test(
+//           "fileRequired",
+//           "Either text or image is required",
+//           (value) => value && value.length > 0
+//         ),
+//       otherwise: yup.mixed(),
+//     }),
+//   })
+//   .required();
+
+// export const postTextImg = yup.object({
+//   text: yup.string().when("img", {
+//     is: (img) => !img || img.length === 0,
+//     then: yup.string().required("Either text or image is required"),
+//     otherwise: yup.string(),
+//   }),
+//   img: yup.mixed().when("text", {
+//     is: (text) => !text,
+//     then: yup.mixed().test(
+//       "fileRequired",
+//       "Either text or image is required",
+//       (value) => value && value.length > 0
+//     ),
+//     otherwise: yup.mixed(),
+//   }),
+// }).required();
+// export const postTextImg = yup.object().shape({
+//   text: yup.string().nullable(),
+//   img: yup.mixed().nullable(),
+// }).test('text-or-img', 'Either text or image is required', function (value) {
+//   const { text, img } = value;
+//   return text || (img && img.length > 0);
+// });
+
+
+// export const postTextImg = yup.object().shape({
+//   text: yup.string().when('img', {
+//     is: (img) => !img || img.length === 0,
+//     then: yup.string().required('Either text or image is required'),
+//     otherwise: yup.string(),
+//   }),
+//   img: yup.mixed().when('text', {
+//     is: (text) => !text,
+//     then: yup.mixed().required('Either text or image is required'),
+//     otherwise: yup.mixed(),
+//   }),
+// });
+
+// export const postTextImg = yup.object().shape({
+//   text: yup.string(),
+//   img: yup.mixed(),
+// }).test('text-or-img', 'Either text or image is required', function (value) {
+//   return value.text || value.img;
+// });
+
+// export const postTextImg = yup.object().shape({
+//   text: yup.string(),
+//   img: yup.mixed().test('fileRequired', 'Either text or image is required', function (value) {
+//     return value instanceof File || typeof value === 'string';
+//   }),
+// }).test('text-or-img', 'Either text or image is required', function (value) {
+//   return value.text || (value.img && value.img.size > 0);
+// });
+
+export const postTextImg = yup.object().shape({
+  text: yup.string().nullable(),
+  img: yup
+    .mixed()
+    .nullable()
+    .test('fileRequired', 'Either text or image is required', function (value) {
+      const { text } = this.parent;
+      return text || (value && value.size > 0);
     }),
-    img: yup.mixed().when("text", {
-      is: (text) => !text,
-      then: yup
-        .mixed()
-        .test(
-          "fileRequired",
-          "Either text or image is required",
-          (value) => value && value.length > 0
-        ),
-      otherwise: yup.mixed(),
-    }),
-  })
-  .required();
+});

@@ -1,28 +1,31 @@
 import React, { createContext, useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import profileImg from '../assets/profile-pic.svg'
+import { useNavigate } from "react-router-dom";
 
 
 const UserContext = createContext();
 
 export const  UserProvider = ({ children })=>{
-    const [bioProfile, setBioProfile] = useState({});
-    const [bio, setBio] = useState("");
-    const [age, setAge] = useState("");
-    const [location, setLocation] = useState("");
-    const [gender, setGender] = useState("");
-    const [occupation, setOccupation] = useState("");
-    const [x, setX] = useState("");
-    const [linkedIn, setLinkedIn] = useState("");
-    const [isCLicked,setIsClicked] = useState(false);
-    const [selectedFile, setSelectedFile] = useState(null);
-    const [preview, setPreview] = useState(profileImg); 
-    const [isLoading, setIsLoading] = useState(false);
-    const [timeLine,setTimeLine] = useState([])
-
-
-   
+  const [bioProfile, setBioProfile] = useState([]);
+  const [bio, setBio] = useState("");
+  const [age, setAge] = useState("");
+  const [location, setLocation] = useState("");
+  const [gender, setGender] = useState("");
+  const [occupation, setOccupation] = useState("");
+  const [x, setX] = useState("");
+  const [linkedIn, setLinkedIn] = useState("");
+  const [isCLicked,setIsClicked] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [preview, setPreview] = useState(profileImg); 
+  const [isLoading, setIsLoading] = useState(false);
+  const [timeLine,setTimeLine] = useState([])
+  
+  
+  
+  
   const token = localStorage.getItem("clientToken");
+  const navigate = useNavigate()
 // bioProfile Ftn
   const getBioProfile = async () => {
       
@@ -91,7 +94,7 @@ export const  UserProvider = ({ children })=>{
         },
       });
       const result = await response.json();
-      console.log(result);
+      // console.log(result);
       if(result){
         setIsClicked(true)
         toast.success(result.message)
@@ -140,7 +143,11 @@ export const  UserProvider = ({ children })=>{
 
   }
 };
-
+//logout
+const logOut = ()=>{
+  localStorage.removeItem("clientToken")
+  navigate("/signin")
+}
 
   useEffect(() => {
     getTimeLine()
@@ -148,6 +155,7 @@ export const  UserProvider = ({ children })=>{
   }, []);
 
     return < UserContext.Provider value={{
+      logOut,
         bio,
         getTimeLine,
         setTimeLine,

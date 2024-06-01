@@ -39,7 +39,7 @@ const ResetPassword = () => {
         }
       );
       const response = await request.json();
-      console.log(response);
+      // console.log(response);
       if (!response.success) {
         toast.error(response.message);
         setIsClicked(true);

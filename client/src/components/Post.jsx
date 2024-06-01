@@ -8,7 +8,7 @@ import cityImg from "../assets/city-img.svg";
 import teaImg from "../assets/tea-img.svg";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
-import { postText } from "../utils/ValidationSchema";
+import { postTextImg } from "../utils/ValidationSchema";
 function Post() {
   const [show, setShow] = useState(false);
 
@@ -20,14 +20,16 @@ function Post() {
     handleSubmit,
     formState: { errors,isSubmitting},
   } = useForm({
-    resolver:yupResolver(postText),
+    resolver:yupResolver(postTextImg),
     defaultValues:{
-      email:"",
-      password:""
+      text:"",
+      img: null 
     }
   });
-
+console.log(errors);
   const handlePost = async(data)=>{
+    console.log(12);
+
 
     try {
       
@@ -36,6 +38,11 @@ function Post() {
     }
 
   }
+
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    setValue('img', file, { shouldValidate: true });
+  };
 
   return (
     <>
@@ -58,11 +65,18 @@ function Post() {
                 style={{ height: "15rem" }}
                 as="textarea"
                 placeholder="Leave a comment here"
+                {...register("text")}
+
               />
+              {errors.text && <p className="text-danger">{errors.text.message}</p>}
+
             </FloatingLabel>
             <Form.Group controlId="formFileLg" className="mb-3">
-              <Form.Control type="file" size="lg" />
+              <Form.Control type="file" size="lg" {...register("img")}/>
+              {errors.img && <p className="text-danger">{errors.img.message}</p>}
+
             </Form.Group>
+            
 
             {/* images */}
             <section className="d-flex  justify-content-between gap-3">
@@ -80,7 +94,9 @@ function Post() {
             </section>
             <div className="text-end">
               <button
-                type="button"
+                type="submit"
+                disabled={isSubmitting}
+
                 className="btn mt-3  px-4 rounded-pill btn-primary btn-sm"
               >
                 post
