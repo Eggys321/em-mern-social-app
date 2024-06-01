@@ -1,42 +1,44 @@
-import { useState,useEffect } from 'react';
+import { useState,useEffect, useContext } from 'react';
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import profileImg from '../assets/profile-img.svg';
 import NavBag from './NavBag';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import UserContext from '../context/UserContext';
 
 function ProfilePopUp({ name, ...props }) {
   const [show, setShow] = useState(false);
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
-  const [bioProfile,setBioProfile] = useState([]);
+  const {getBioProfile,setBioProfile,bioProfile} = useContext(UserContext)
+  // const [bioProfile,setBioProfile] = useState([]);
 
   const token = localStorage.getItem("clientToken");
   const navigate = useNavigate();
-  const getBioProfile = async ()=>{
-    try {
+  // const getBioProfile = async ()=>{
+  //   try {
       
-      const request = await fetch("https://em-mern-social-app.onrender.com/api/v1/users",{
-        headers:{
-          "Content-type":"application/json",
-          Authorization:`Bearer ${token}`
-        }
-      })
-      const response = await request.json();
-      // console.log(response.user);
-      setBioProfile(response.user)
-    } catch (error) {
-      console.log(error.message);
-    }
-  }
+  //     const request = await fetch("https://em-mern-social-app.onrender.com/api/v1/users",{
+  //       headers:{
+  //         "Content-type":"application/json",
+  //         Authorization:`Bearer ${token}`
+  //       }
+  //     })
+  //     const response = await request.json();
+  //     // console.log(response.user);
+  //     setBioProfile(response.user)
+  //   } catch (error) {
+  //     console.log(error.message);
+  //   }
+  // }
 
   useEffect(()=>{
     if(!token){
       toast.error("unauthorized,sign in")
         navigate('/signin');
     }
-    getBioProfile()
+    // getBioProfile()
 },[])
 
   return (

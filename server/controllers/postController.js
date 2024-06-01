@@ -46,6 +46,8 @@ const createPost = async (req, res) => {
     });
     //   req.body.user = userId
     await post.save();
+    // Update timeline
+    // const timelineUpdate = await getTimeline(req.user.userId, post._id);
     res.status(201).json({success:true,message:"post created successfully",post})
   } catch (error) {
     res.status(500).json(error.message)
@@ -59,7 +61,10 @@ const getTimeline = async (req,res)=>{
         const followingIds = user.following.map((fIdx)=> fIdx._id);
         followingIds.push(userId);
 
-        const posts = await POST.find({user:{$in:followingIds}}).populate("user",'userName').populate("comments.user","userName").sort({createdAt:-1});
+        const posts = await POST.find({user:{$in:followingIds}}).populate({
+          path: "user",
+          select: "userName profilePhoto"
+      }).populate("comments.user","userName").sort({createdAt:-1});
         res.status(200).json({success:true,message:"timeline post",posts})
     } catch (error) {
         res.status(500).json(error.message)

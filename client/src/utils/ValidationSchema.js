@@ -21,21 +21,21 @@ export const regFormSchema = yup
   })
   .required();
 
-  // for resetpasswordlink
+// for resetpasswordlink
 export const resetPwdLinkSchema = yup
-.object({
-  password: yup
-    .string()
-    .required("Password is required")
-    .min(8, "min lenght of password should be at least 8 chrs"),
+  .object({
+    password: yup
+      .string()
+      .required("Password is required")
+      .min(8, "min lenght of password should be at least 8 chrs"),
 
-  confirmPassword: yup
-    .string()
-    .required("Confirm password is required")
-    .min(8, "min lenght of password should be at least 8 chrs")
-    .oneOf([yup.ref("password")], "Password do not match"),
-})
-.required();
+    confirmPassword: yup
+      .string()
+      .required("Confirm password is required")
+      .min(8, "min lenght of password should be at least 8 chrs")
+      .oneOf([yup.ref("password")], "Password do not match"),
+  })
+  .required();
 // for sign in
 export const signInSchema = yup
   .object({
@@ -50,15 +50,15 @@ export const signInSchema = yup
   })
   .required();
 
-  // for forgot password
+// for forgot password
 export const forgotPasswordSchema = yup
-.object({
-  email: yup
-    .string()
-    .required("Email is required")
-    .email("Invalid email format")
-})
-.required();
+  .object({
+    email: yup
+      .string()
+      .required("Email is required")
+      .email("Invalid email format"),
+  })
+  .required();
 
 // post text only
 export const postText = yup

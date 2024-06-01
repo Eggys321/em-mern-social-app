@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import { useState, useEffect } from "react";
 import locationImg from "../assets/location.svg";
 import realtorImg from "../assets/realtor.svg";
@@ -7,35 +7,37 @@ import twitterImg from "../assets/twitter.svg";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { SpinnerLoader } from "../utils/Loader";
+import UserContext from "../context/UserContext";
 
 const Bio = () => {
-  const [bioProfile, setBioProfile] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+  // const [bioProfile, setBioProfile] = useState([]);
+  // const [isLoading, setIsLoading] = useState(false);
+  const {getBioProfile,bioProfile,isLoading, setIsLoading} = useContext(UserContext)
 
   const token = localStorage.getItem("clientToken");
   const navigate = useNavigate();
 
-  const getBioProfile = async () => {
-    try {
-      setIsLoading(true);
-      const request = await fetch(
-        "https://em-mern-social-app.onrender.com/api/v1/users",
-        {
-          headers: {
-            "Content-type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      const response = await request.json();
-      // console.log(response.user);
-      setBioProfile(response.user);
-    } catch (error) {
-      console.log(error.message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  // const getBioProfile = async () => {
+  //   try {
+  //     setIsLoading(true);
+  //     const request = await fetch(
+  //       "https://em-mern-social-app.onrender.com/api/v1/users",
+  //       {
+  //         headers: {
+  //           "Content-type": "application/json",
+  //           Authorization: `Bearer ${token}`,
+  //         },
+  //       }
+  //     );
+  //     const response = await request.json();
+  //     // console.log(response.user);
+  //     setBioProfile(response.user);
+  //   } catch (error) {
+  //     console.log(error.message);
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
 
   useEffect(() => {
     if (!token) {
@@ -65,7 +67,7 @@ const Bio = () => {
                   src={bioProfile?.profilePhoto}
                   alt=""
                   className="profile-img w-25 "
-                  style={{ borderRadius: "5rem", height: "6rem" }}
+                  style={{ borderRadius: "100%", height: "6rem" }}
                 />
                 <div className="d-flex flex-column ">
                   <span className=""> {bioProfile?.userName} </span>

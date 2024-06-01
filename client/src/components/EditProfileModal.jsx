@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Modal from "react-bootstrap/Modal";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import { comments } from "../db";
 import editProfileImg from "../assets/editprofileimg.png";
-import profileImg from "../assets/profile-pic.svg";
+// import profileImg from "../assets/profile-pic.svg";
 import bioImg from "../assets/bio-img.svg";
 import ageImg from "../assets/age-img.svg";
 import genderImg from "../assets/gender-img.svg";
@@ -16,98 +16,122 @@ import "../styles/EditProfile.css";
 import { useNavigate } from "react-router-dom";
 import {Loader} from "../utils/Loader";
 import toast from "react-hot-toast";
+import UserContext from "../context/UserContext";
 
 function EditProfileModal(props) {
-  const [bioProfile, setBioProfile] = useState([]);
-  const [bio, setBio] = useState("");
-  const [age, setAge] = useState("");
-  const [location, setLocation] = useState("");
-  const [gender, setGender] = useState("");
-  const [occupation, setOccupation] = useState("");
-  const [x, setX] = useState("");
-  const [linkedIn, setLinkedIn] = useState("");
-  const [isCLicked,setIsClicked] = useState(false);
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [preview, setPreview] = useState(profileImg); 
+  // const [bioProfile, setBioProfile] = useState([]);
+  // const [bio, setBio] = useState("");
+  // const [age, setAge] = useState("");
+  // const [location, setLocation] = useState("");
+  // const [gender, setGender] = useState("");
+  // const [occupation, setOccupation] = useState("");
+  // const [x, setX] = useState("");
+  // const [linkedIn, setLinkedIn] = useState("");
+  // const [isCLicked,setIsClicked] = useState(false);
+  // const [selectedFile, setSelectedFile] = useState(null);
+  // const [preview, setPreview] = useState(profileImg); 
+
+  const { getBioProfile,
+  handleSubmit,
+    handleFileChange,
+    bioProfile,
+    bio,
+    setBio,
+    setBioProfile,
+    age,
+    setAge,
+    location,
+    setLocation,
+    gender,
+    setGender,
+    occupation,
+    setOccupation,
+    x,
+    setX,
+    linkedIn,
+    setLinkedIn,
+    isCLicked,
+    preview
+  } = useContext(UserContext)
 
 
 
   const token = localStorage.getItem("clientToken");
   const navigate = useNavigate();
 
-  const getBioProfile = async () => {
-    try {
-      const request = await fetch("https://em-mern-social-app.onrender.com/api/v1/users", {
-        headers: {
-          "Content-type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const response = await request.json();
-      // console.log(response.user);
-      setBioProfile(response.user);
-      setBio(response.user.bio);
-      setLocation(response.user.location);
-      setOccupation(response.user.occupation);
-      setX(response.user.x);
-      setLinkedIn(response.user.linkedIn);
-      setAge(response.user.age || "") ;     
-      setGender(response.user.gender || "");
-      setPreview(response.user.profilePhoto || profileImg); 
-    } catch (error) {
-      console.log(error.message);
-    }
-  };
+  // const getBioProfile = async () => {
+  //   try {
+  //     const request = await fetch("https://em-mern-social-app.onrender.com/api/v1/users", {
+  //       headers: {
+  //         "Content-type": "application/json",
+  //         Authorization: `Bearer ${token}`,
+  //       },
+  //     });
+  //     const response = await request.json();
+  //     // console.log(response.user);
+  //     setBioProfile(response.user);
+  //     setBio(response.user.bio);
+  //     setLocation(response.user.location);
+  //     setOccupation(response.user.occupation);
+  //     setX(response.user.x);
+  //     setLinkedIn(response.user.linkedIn);
+  //     setAge(response.user.age || "") ;     
+  //     setGender(response.user.gender || "");
+  //     setPreview(response.user.profilePhoto || profileImg); 
+  //   } catch (error) {
+  //     console.log(error.message);
+  //   }
+  // };
 
-  const handleFileChange = (event) => {
-    const file = event.target.files[0];
-    setSelectedFile(file);
+  // const handleFileChange = (event) => {
+  //   const file = event.target.files[0];
+  //   setSelectedFile(file);
 
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setPreview(reader.result);
-    };
-    if (file) {
-      reader.readAsDataURL(file);
-    }
-  };
+  //   const reader = new FileReader();
+  //   reader.onloadend = () => {
+  //     setPreview(reader.result);
+  //   };
+  //   if (file) {
+  //     reader.readAsDataURL(file);
+  //   }
+  // };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    const formData = new FormData();
-    formData.append("bio", bio);
-    formData.append("age", age);
-    formData.append("location", location);
-    formData.append("gender", gender);
-    formData.append("occupation", occupation);
-    formData.append("x", x);
-    formData.append("linkedIn", linkedIn);
-    if (selectedFile) {
-      formData.append("profilePhoto", selectedFile);
-    }
-    setIsClicked(true)
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault()
+  //   const formData = new FormData();
+  //   formData.append("bio", bio);
+  //   formData.append("age", age);
+  //   formData.append("location", location);
+  //   formData.append("gender", gender);
+  //   formData.append("occupation", occupation);
+  //   formData.append("x", x);
+  //   formData.append("linkedIn", linkedIn);
+  //   if (selectedFile) {
+  //     formData.append("profilePhoto", selectedFile);
+  //   }
+  //   setIsClicked(true)
 
-    try {
-      const response = await fetch("https://em-mern-social-app.onrender.com/api/v1/users/update-profile", {
-        method: "PATCH",
-        body: formData,
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const result = await response.json();
-      console.log(result);
-      if(result){
-        setIsClicked(true)
-        toast.success(result.message)
-      }
-    } catch (error) {
-      console.error("Error updating profile:", error);
+  //   try {
+  //     const response = await fetch("https://em-mern-social-app.onrender.com/api/v1/users/update-profile", {
+  //       method: "PATCH",
+  //       body: formData,
+  //       headers: {
+  //         Authorization: `Bearer ${token}`,
+  //       },
+  //     });
+  //     const result = await response.json();
+  //     console.log(result);
+  //     if(result){
+  //       setIsClicked(true)
+  //       toast.success(result.message)
+  //     }
+  //   } catch (error) {
+  //     console.error("Error updating profile:", error);
 
-    }finally{
-      setIsClicked(false)
-    }
-  };
+  //   }finally{
+  //     setIsClicked(false)
+  //   }
+  // };
 
   const btnText = isCLicked ? <Loader/> : "Continue";
 
@@ -117,7 +141,7 @@ function EditProfileModal(props) {
       toast.error("unauthorized,sign in");
       navigate("/signin");
     }
-    getBioProfile();
+    // getBioProfile();
   }, []);
   return (
     <Modal

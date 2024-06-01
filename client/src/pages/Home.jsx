@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import NavSection from "../components/NavSection";
 import Navbar from "../layouts/Navbar";
 import profileImg from "../assets/profile-img.svg";
@@ -6,7 +6,8 @@ import "../styles/Home.css";
 import Post from "../components/Post";
 import { people } from "../db";
 import commentImg from "../assets/comment-image.svg";
-import likeImg from "../assets/like-img.svg";
+import unLikeImg from "../assets/like-img.svg";
+import likeImg from '../assets/heart.jpg'
 import shareImg from "../assets/share-img.svg";
 import CommentModal from "../components/ComentModal";
 import { useNavigate } from "react-router-dom";
@@ -15,32 +16,47 @@ import Bio from "../components/Bio";
 import { postText } from "../utils/ValidationSchema";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
+import UserContext from "../context/UserContext";
+import TimeAgo from "../components/TimeAgo";
+import { LazyLoadImage } from "react-lazy-load-image-component";
 
 const Home = () => {
   const [modalShow, setModalShow] = useState(false);
-  const [bioProfile, setBioProfile] = useState([]);
+  // const [bioProfile, setBioProfile] = useState([]);
   // console.log(people);
+  const { getBioProfile, bioProfile, timeLine ,getTimeLine,setTimeLine} = useContext(UserContext);
   const navigate = useNavigate();
   const token = localStorage.getItem("clientToken");
+  
+  // console.log(timeLine);
+const handleLike = async()=>{
+  try {
+    
+  } catch (error) {
+    
+  }
+}
+  // timeline
 
-  const getBioProfile = async () => {
-    try {
-      const request = await fetch(
-        "https://em-mern-social-app.onrender.com/api/v1/users",
-        {
-          headers: {
-            "Content-type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      const response = await request.json();
-      // console.log(response.user);
-      setBioProfile(response.user);
-    } catch (error) {
-      console.log(error.message);
-    }
-  };
+
+  // const getBioProfile = async () => {
+  //   try {
+  //     const request = await fetch(
+  //       "https://em-mern-social-app.onrender.com/api/v1/users",
+  //       {
+  //         headers: {
+  //           "Content-type": "application/json",
+  //           Authorization: `Bearer ${token}`,
+  //         },
+  //       }
+  //     );
+  //     const response = await request.json();
+  //     // console.log(response.user);
+  //     setBioProfile(response.user);
+  //   } catch (error) {
+  //     console.log(error.message);
+  //   }
+  // };
 
   // for the post
   const {
@@ -73,11 +89,16 @@ const Home = () => {
           body: JSON.stringify(data),
         }
       );
+      // getTimeLine()
       const response = await request.json();
       console.log(response);
       if (response.success) {
         reset();
         toast.success(response.message);
+        getTimeLine();
+
+        // setTimeLine(prevTimeLine => [response.post, ...prevTimeLine]);
+
       }
     } catch (error) {
       console.log(error);
@@ -90,7 +111,7 @@ const Home = () => {
       toast.error("unauthorized,sign in");
       navigate("/signin");
     }
-    getBioProfile();
+    // getBioProfile();
     document.title = "Home | page";
   }, []);
 
@@ -120,7 +141,7 @@ const Home = () => {
                       alt=""
                       className="profile-img "
                       style={{
-                        borderRadius: "5rem",
+                        borderRadius: "100%",
                         height: "4rem",
                         width: "4rem",
                       }}
@@ -135,15 +156,14 @@ const Home = () => {
                   </div>
                   {/*  */}
                   <div className=" d-flex align-items-center justify-content-between mt-1">
-                 <div className="d-flex justify-content-between home-post-error-state align-items-center">
-                    <Post />
-                 <div >
-                 <span className="text-danger   fs-6 text-start fw-bold">
-                    {errors.text?.message}
-                  </span>
-                 </div>
-
-                 </div>
+                    <div className="d-flex justify-content-between home-post-error-state align-items-center">
+                      <Post />
+                      <div>
+                        <span className="text-danger   fs-6 text-start fw-bold">
+                          {errors.text?.message}
+                        </span>
+                      </div>
+                    </div>
                     <button
                       className="btn btn-sm btn-primary text-light px-4 rounded-pill"
                       disabled={isSubmitting}
@@ -159,19 +179,30 @@ const Home = () => {
                   show={modalShow}
                   onHide={() => setModalShow(false)}
                 />
-                {people.map((person) => {
-                  const { id, name, time, post, profileImg, postImg, follow } =
+                {timeLine.map((person) => {
+                  const { _id, name, time, post, profileImg, postImg, follow } =
                     person;
                   return (
-                    <div key={id} className="p-2 mb-3 rounded-2 scroll-page">
+                    <div key={_id} className="p-2 mb-3 rounded-2 scroll-page">
                       {/* top div */}
                       <div className="d-flex justify-content-between align-items-center ">
                         {/* img and time */}
                         <div className="d-flex gap-2 align-items-center">
-                          <img src={profileImg} alt="" className="" />
+                          <img
+                            src={person.user.profilePhoto}
+                            alt=""
+                            className="profile-img "
+                            style={{
+                              borderRadius: "100%",
+                              height: "4rem",
+                              width: "4rem",
+                            }}
+                          />
                           <span className="d-flex flex-column justify-content-center ">
-                            <h5 className="pt-3">{name}</h5>
-                            <p>{time}</p>
+                            <h5 className="pt-3">{person.user.userName}</h5>
+                            <p>
+                              <TimeAgo date={person?.createdAt} />
+                            </p>
                           </span>
                         </div>
 
@@ -184,17 +215,28 @@ const Home = () => {
                       </div>
 
                       {/* post */}
-                      <p>{post}</p>
+                      <p>{person.text}</p>
 
                       {/* post-img */}
-                      <img src={postImg} className="w-100" alt="" />
+                      {/* <img src={person.imagePath} className="w-100" alt="" /> */}
+                      <LazyLoadImage
+                        // alt={image.alt}
+                        height={"100%"}
+                        width={"100%"}
+                        effect="blur"
+                        // className="w-100"
+                        src={person.imagePath}
+                      />
 
                       {/* reactions */}
                       <main className="d-flex pt-2 justify-content-between align-items-center">
                         {/* like and comment */}
 
                         <div className="d-flex gap-2">
-                          <img src={likeImg} alt="" role="button" />
+                          <div onClick={()=>handleLike(_id)}>
+
+                          <img src={unLikeImg} alt="" role="button" />
+                          </div>
                           <div
                             show={modalShow}
                             onClick={() => setModalShow(true)}

@@ -168,7 +168,7 @@ const Navbar = () => {
                 src={bioProfile?.profilePhoto}
                 alt=""
                 className="profile-img p-1 "
-                style={{ borderRadius: "5rem", height: "3rem", width: "4rem" }}
+                style={{ borderRadius: "100%", height: "3rem", width: "4rem" }}
               />{" "}
               <span className="d-flex">
                 Me
