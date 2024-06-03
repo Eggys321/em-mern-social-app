@@ -251,6 +251,7 @@ const Home = () => {
                   show={modalShow}
                   onHide={() => setModalShow(false)}
                 />
+                {timeLine.length < 1 && <p className="fs-5  fw-bold">No posts yet,create a post or follow others to see posts on your timeline👌</p>}
                 {timeLine?.map((person) => {
                   const { _id, name, time, post, profileImg, postImg, follow } =
                     person;
