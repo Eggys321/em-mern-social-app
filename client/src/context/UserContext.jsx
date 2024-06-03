@@ -126,7 +126,7 @@ export const  UserProvider = ({ children })=>{
       
     try {
       setIsLoading(true);
-      const request = await fetch("http://localhost:5782/api/v1/posts/timeline", {
+      const request = await fetch("https://em-mern-social-app.onrender.com/api/v1/posts/timeline", {
           headers: {
               "Content-type": "application/json",
               Authorization: `Bearer ${token}`,
