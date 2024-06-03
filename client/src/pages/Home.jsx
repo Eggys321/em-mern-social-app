@@ -70,7 +70,7 @@ const Home = () => {
   // second
   const handleLike = async (postId) => {
     try {
-      const response = await fetch(`http://localhost:5782/api/v1/posts/like-post/${postId}`, {
+      const response = await fetch(`https://em-mern-social-app.onrender.com/api/v1/posts/like-post/${postId}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
