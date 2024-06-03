@@ -24,6 +24,8 @@ const Home = () => {
   const [modalShow, setModalShow] = useState(false);
   const [likedPosts, setLikedPosts] = useState({});
   const [likeCounts, setLikeCounts] = useState({});
+  const [currentPostId, setCurrentPostId] = useState(null);
+
   const userId = localStorage.getItem("userId");
 
   // const [bioProfile, setBioProfile] = useState([]);
@@ -135,10 +137,6 @@ const Home = () => {
   // console.log("errors", errors);
 
   const handlePost = async (data) => {
-    // console.log(data);
-    // setIsClicked(true)
-    // console.log(data);
-
     try {
       const request = await fetch(
         "https://em-mern-social-app.onrender.com/api/v1/posts/create-post",
@@ -167,6 +165,10 @@ const Home = () => {
     }
   };
 
+  const openCommentModal = (postId) => {
+    setCurrentPostId(postId);
+    setModalShow(true);
+  };
   useEffect(() => {
     if (!token) {
       toast.error("unauthorized,sign in");
@@ -249,6 +251,8 @@ const Home = () => {
               <div>
                 <CommentModal
                   show={modalShow}
+                  postId={currentPostId}
+
                   onHide={() => setModalShow(false)}
                 />
                 {timeLine.length < 1 && <p className="fs-5  fw-bold">No posts yet,create a post or follow others to see posts on your timeline👌</p>}
@@ -284,7 +288,8 @@ const Home = () => {
                         {/* btn-div */}
                         <div>
                           <button className="btn btn-white btn-sm rounded-pill border px-2">
-                            {follow}
+                            {/* {person?.user?.following} */}
+                            {/* {!person.user.following ? "follow": "following"} */}
                           </button>
                         </div>
                       </div>
@@ -318,7 +323,7 @@ const Home = () => {
                           </div>
                           <div
                             show={modalShow}
-                            onClick={() => setModalShow(true)}
+                            onClick={() => openCommentModal(_id)}
                           >
                             <img src={commentImg} alt="" role="button" />
                           </div>

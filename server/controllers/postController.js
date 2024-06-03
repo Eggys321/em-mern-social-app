@@ -63,7 +63,7 @@ const getTimeline = async (req,res)=>{
 
         const posts = await POST.find({user:{$in:followingIds}}).populate({
           path: "user",
-          select: "userName profilePhoto"
+          select: "userName profilePhoto follower following"
       }).populate("comments.user","userName").sort({createdAt:-1});
         res.status(200).json({success:true,message:"timeline post",posts})
     } catch (error) {
@@ -939,7 +939,7 @@ const deletePost = async (req, res) => {
 // get comments for a post
 const getComments = async(req,res)=>{
   try {
-    const post = await POST.findById(req.params.postId).populate('comments.user', 'userName');
+    const post = await POST.findById(req.params.postId).populate('comments.user', 'userName profilePhoto');
     if (!post) {
       return res.status(404).json({ success:false,message: 'Post not found.' });
     }
