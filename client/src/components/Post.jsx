@@ -26,9 +26,9 @@ function Post() {
       img: null 
     }
   });
-console.log(errors);
+// console.log(errors);
   const handlePost = async(data)=>{
-    console.log(12);
+    // console.log(12);
 
 
     try {

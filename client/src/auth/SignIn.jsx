@@ -14,6 +14,8 @@ import {Loader} from "../utils/Loader";
 import { signInSchema } from '../utils/ValidationSchema';
 import { yupResolver } from "@hookform/resolvers/yup";
 import toast from 'react-hot-toast';
+import {jwtDecode} from 'jwt-decode';
+
 
 
 const SignIn = () => {
@@ -58,6 +60,11 @@ const navigate = useNavigate()
       if(response.success){
         toast.success(response.message)
         localStorage.setItem("clientToken",response.user.token)
+         // Decode token to get userId
+      const decodedToken = jwtDecode(response.user.token);
+      const userId = decodedToken.userId;
+      console.log(userId); // Log the userId to verify it is present
+      localStorage.setItem("userId", userId);
         navigate("/")
       }
     } catch (error) {

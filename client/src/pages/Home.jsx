@@ -22,20 +22,45 @@ import { LazyLoadImage } from "react-lazy-load-image-component";
 
 const Home = () => {
   const [modalShow, setModalShow] = useState(false);
+  const [likedPosts, setLikedPosts] = useState({});
+  const [likeCounts, setLikeCounts] = useState({});
   // const [bioProfile, setBioProfile] = useState([]);
   // console.log(people);
   const { getBioProfile, bioProfile, timeLine ,getTimeLine,setTimeLine} = useContext(UserContext);
   const navigate = useNavigate();
   const token = localStorage.getItem("clientToken");
   
-  // console.log(timeLine);
-const handleLike = async()=>{
-  try {
-    
-  } catch (error) {
-    
-  }
-}
+  const handleLike = async (postId) => {
+    try {
+      const response = await fetch(`https://em-mern-social-app.onrender.com/api/v1/posts/like-post/${postId}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = await response.json();
+      if (response.ok) {
+        const updatedLikedPosts = { ...likedPosts };
+        if (updatedLikedPosts[postId]) {
+          // Post is already liked, so set it to unliked
+          updatedLikedPosts[postId] = false;
+        } else {
+          // Post is not liked, so set it to liked
+          updatedLikedPosts[postId] = true;
+        }
+        setLikedPosts(updatedLikedPosts);
+        localStorage.setItem("likedPosts", JSON.stringify(updatedLikedPosts));
+        getTimeLine();
+        toast.success(data.message);
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      console.error("Error liking/unliking post:", error);
+      toast.error("Failed to like/unlike post. Please try again.");
+    }
+  };
   // timeline
 
 
@@ -111,6 +136,17 @@ const handleLike = async()=>{
       toast.error("unauthorized,sign in");
       navigate("/signin");
     }
+    const storedLikedPosts = JSON.parse(localStorage.getItem("likedPosts"));
+    if (storedLikedPosts) {
+      setLikedPosts(storedLikedPosts);
+    }
+
+    const counts = {};
+    timeLine.forEach((post) => {
+      counts[post._id] = post.likes.length;
+    });
+    setLikeCounts(counts);
+    getTimeLine()
     // getBioProfile();
     document.title = "Home | page";
   }, []);
@@ -182,6 +218,8 @@ const handleLike = async()=>{
                 {timeLine.map((person) => {
                   const { _id, name, time, post, profileImg, postImg, follow } =
                     person;
+                    const isLiked = likedPosts[_id] || false;
+                    const likeCount = likeCounts[_id] || 0;
                   return (
                     <div key={_id} className="p-2 mb-3 rounded-2 scroll-page">
                       {/* top div */}
@@ -235,8 +273,8 @@ const handleLike = async()=>{
                         <div className="d-flex gap-2">
                           <div onClick={()=>handleLike(_id)}>
 
-                          <img src={unLikeImg} alt="" role="button" />
-                          </div>
+                          <img src={isLiked ? likeImg : unLikeImg} alt="" role="button" />
+                <div>{likeCount}</div>                          </div>
                           <div
                             show={modalShow}
                             onClick={() => setModalShow(true)}

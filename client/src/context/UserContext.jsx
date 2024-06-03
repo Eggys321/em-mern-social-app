@@ -39,15 +39,15 @@ export const  UserProvider = ({ children })=>{
         });
         const response = await request.json();
         // console.log(response.user);
-        setBioProfile(response.user);
-        setBio(response.user.bio || "");
-        setLocation(response.user.location);
-        setOccupation(response.user.occupation);
-        setX(response.user.x);
-        setLinkedIn(response.user.linkedIn);
-        setAge(response.user.age || "") ;     
-        setGender(response.user.gender || "");
-        setPreview(response.user.profilePhoto || profileImg); 
+        setBioProfile(response?.user);
+        setBio(response?.user?.bio || "");
+        setLocation(response?.user?.location);
+        setOccupation(response?.user?.occupation);
+        setX(response?.user?.x);
+        setLinkedIn(response?.user?.linkedIn);
+        setAge(response?.user?.age || "") ;     
+        setGender(response?.user?.gender || "");
+        setPreview(response?.user?.profilePhoto || profileImg); 
     } catch (error) {
         console.log(error.message);
     }finally{
@@ -134,7 +134,7 @@ export const  UserProvider = ({ children })=>{
       });
       const response = await request.json();
       // console.log(response.posts);
-      setTimeLine(response?.posts)
+      setTimeLine(response?.posts || []); 
       
   } catch (error) {
       console.log(error.message);
