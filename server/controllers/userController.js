@@ -1,3 +1,4 @@
+const POST = require("../model/postModel");
 const USER = require("../model/userModel");
 const cloudinary = require("cloudinary").v2;
 const fs = require("fs");
@@ -112,9 +113,12 @@ const getSingleUser = async (req, res) => {
     const user = await USER.findById(userId).select("-password");
     if (!user) {
       res.status(404).json({ success: false, message: "user not found" });
+      return;
     }
+    // fetching user posts
+    const posts = await POST.find({user:userId});
 
-    res.status(200).json({ success: true, message: "user profile", user });
+    res.status(200).json({ success: true, message: "user profile", user,posts });
   } catch (error) {
     res.status(500).json(error.message);
   }

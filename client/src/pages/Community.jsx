@@ -142,11 +142,11 @@ const Community = () => {
   }, [token]);
   return (
     <>
-      <Navbar />
+      {/* <Navbar /> */}
 
       <main className="container">
         <div className=" row  gap-2 pt-3">
-          <section className="vh-100 col-lg-4 d-none d-lg-block p-2 rounded-2 border profile-section ">
+          <section style={{height:"45rem"}} className="col-lg-4 d-none d-lg-block p-2 rounded-2 border profile-section ">
             <Bio />
           </section>
           {/* all users */}

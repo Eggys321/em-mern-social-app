@@ -147,11 +147,16 @@ const likePost = async(req,res)=>{
 
 // comments
 const commentPost = async(req,res)=>{
-  const {userId} = req.user
+  const {userId} = req.user;
+  const {text} = req.body;
   try {
     const post = await POST.findById(req.params.postId);
     if (!post) {
       return res.status(404).json({success:false, message: 'Post not found.' });
+    }
+    if(!text){
+      return res.status(400).json({success:false, message: 'comment box can not be empty' });
+
     }
 
     const comment = {user:userId, text: req.body.text };

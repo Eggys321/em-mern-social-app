@@ -61,7 +61,7 @@ function EditProfileModal(props) {
 
   // const getBioProfile = async () => {
   //   try {
-  //     const request = await fetch("https://em-mern-social-app.onrender.com/api/v1/users", {
+  //     const request = await fetch("http://localhost:5782/api/v1/users", {
   //       headers: {
   //         "Content-type": "application/json",
   //         Authorization: `Bearer ${token}`,
@@ -112,7 +112,7 @@ function EditProfileModal(props) {
   //   setIsClicked(true)
 
   //   try {
-  //     const response = await fetch("https://em-mern-social-app.onrender.com/api/v1/users/update-profile", {
+  //     const response = await fetch("http://localhost:5782/api/v1/users/update-profile", {
   //       method: "PATCH",
   //       body: formData,
   //       headers: {

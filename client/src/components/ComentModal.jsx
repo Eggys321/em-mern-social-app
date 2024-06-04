@@ -5,13 +5,16 @@ import Button from "react-bootstrap/Button";
 import { comments } from "../db";
 import toast from "react-hot-toast";
 import TimeAgo from "./TimeAgo";
-
+import { SpinnerLoader } from "../utils/Loader";
 function CommentModal({ postId, show, onHide,onCommentAdded }) {
   const [comment, setComment] = useState("");
   const [comments, setComments] = useState([]);
+  const [isClicked,setIsClicked] = useState(false);
+  const [isLoading,setIsLoading] = useState(false);
 
   const fetchComments = async () => {
     try {
+      setIsLoading(true)
       const response = await fetch(
         `https://em-mern-social-app.onrender.com/api/v1/posts/comments/${postId}`
       );
@@ -24,6 +27,8 @@ function CommentModal({ postId, show, onHide,onCommentAdded }) {
       }
     } catch (error) {
       toast.error("Failed to fetch comments.");
+    }finally{
+      setIsLoading(false)
     }
   };
   const handleCommentChange = (e) => {
@@ -33,6 +38,7 @@ function CommentModal({ postId, show, onHide,onCommentAdded }) {
   const handleCommentSubmit = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem("clientToken");
+    setIsClicked(true)
 
     try {
       const response = await fetch(
@@ -47,19 +53,24 @@ function CommentModal({ postId, show, onHide,onCommentAdded }) {
         }
       );
       const data = await response.json();
+      console.log(data);
       if (response.ok) {
         toast.success(data.message);
         fetchComments(); // Fetch the updated comments
         setComment("");
         onCommentAdded(postId)
-         // Clear the comment input
+        // Clear the comment input
       } else {
         toast.error(data.message);
       }
     } catch (error) {
       toast.error("Failed to add comment. Please try again.");
+    }finally{
+      setIsClicked(false)
     }
   };
+
+  const btnTxt = isClicked ? <SpinnerLoader/>: "Post"
 
   useEffect(() => {
     if (show) {
@@ -94,13 +105,15 @@ function CommentModal({ postId, show, onHide,onCommentAdded }) {
             />
           </Form.Group>
           <div className="text-end">
-            <Button variant="primary" type="submit" className="w-25  rounded-5">
-              Post
+            <Button variant="primary" type="submit" className="w-25  rounded-5"     disabled = {isClicked}>
+              {btnTxt}
             </Button>
           </div>
         </Form>
+
         <section>
-          <h5 className="my-4">Previous comments</h5>
+          {isLoading && <SpinnerLoader/>}
+          <h5 className="my-4">{comments && comments.length >=1 ? "Comment(s)":"No comment(s) yet"}</h5>
           <div className="">
             {comments.map((comment) => {
               const { _id, text, time, user, profileImg,createdAt } = comment;

@@ -106,7 +106,7 @@ const Home = () => {
   // const getBioProfile = async () => {
   //   try {
   //     const request = await fetch(
-  //       "https://em-mern-social-app.onrender.com/api/v1/users",
+  //       "http://localhost:5782/api/v1/users",
   //       {
   //         headers: {
   //           "Content-type": "application/json",
@@ -202,7 +202,7 @@ const Home = () => {
       <div className="home-wrapper">
         <div className="container">
           <main className=" row home-main gap-2 pt-3">
-            <section className="vh-100 col-lg-4 d-none d-lg-block p-2 rounded-2 border profile-section ">
+            <section style={{height:"45rem"}} className=" col-lg-4 d-none d-lg-block p-2 rounded-2 border profile-section ">
               <Bio />
             </section>
 
