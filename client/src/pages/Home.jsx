@@ -169,6 +169,10 @@ const Home = () => {
     setCurrentPostId(postId);
     setModalShow(true);
   };
+
+  const handleCommentAdded=()=>{
+    getTimeLine()
+  }
   useEffect(() => {
     if (!token) {
       toast.error("unauthorized,sign in");
@@ -254,6 +258,7 @@ const Home = () => {
                   postId={currentPostId}
 
                   onHide={() => setModalShow(false)}
+                  onCommentAdded={handleCommentAdded}
                 />
                 {timeLine.length < 1 && <p className="fs-5  fw-bold">No posts yet,create a post or follow others to see posts on your timeline👌</p>}
                 {timeLine?.map((person) => {
@@ -312,21 +317,22 @@ const Home = () => {
                       <main className="d-flex pt-2 justify-content-between align-items-center">
                         {/* like and comment */}
 
-                        <div className="d-flex gap-2">
+                        <div className="d-flex gap-2 ">
                           <div onClick={() => handleLike(_id)}>
                             <img
                               src={isLiked ? likeImg : unLikeImg}
                               alt=""
                               role="button"
                             />
-                            <div>{likeCount} like(s)</div>{" "}
                           </div>
+                            <div className="mt-2">{likeCount} like(s)</div>{" "}
                           <div
                             show={modalShow}
                             onClick={() => openCommentModal(_id)}
                           >
                             <img src={commentImg} alt="" role="button" />
                           </div>
+                          <p className="mt-2"> {person.commentsCount} comment(s) </p>
                         </div>
 
                         {/* share */}

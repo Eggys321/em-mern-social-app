@@ -65,7 +65,14 @@ const getTimeline = async (req,res)=>{
           path: "user",
           select: "userName profilePhoto follower following"
       }).populate("comments.user","userName").sort({createdAt:-1});
-        res.status(200).json({success:true,message:"timeline post",posts})
+
+       // Add comment count to each post
+    const postsWithCommentsCount = posts.map(post => ({
+      ...post.toObject(),
+      commentsCount: post.comments.length
+    }));
+
+        res.status(200).json({success:true,message:"timeline post",posts:postsWithCommentsCount})
     } catch (error) {
         res.status(500).json(error.message)
     }

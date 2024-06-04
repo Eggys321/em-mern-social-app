@@ -6,7 +6,7 @@ import { comments } from "../db";
 import toast from "react-hot-toast";
 import TimeAgo from "./TimeAgo";
 
-function CommentModal({ postId, show, onHide }) {
+function CommentModal({ postId, show, onHide,onCommentAdded }) {
   const [comment, setComment] = useState("");
   const [comments, setComments] = useState([]);
 
@@ -50,7 +50,9 @@ function CommentModal({ postId, show, onHide }) {
       if (response.ok) {
         toast.success(data.message);
         fetchComments(); // Fetch the updated comments
-        setComment(""); // Clear the comment input
+        setComment("");
+        onCommentAdded(postId)
+         // Clear the comment input
       } else {
         toast.error(data.message);
       }
