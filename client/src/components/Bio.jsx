@@ -10,34 +10,34 @@ import { SpinnerLoader } from "../utils/Loader";
 import UserContext from "../context/UserContext";
 
 const Bio = () => {
-  // const [bioProfile, setBioProfile] = useState([]);
+  const [bioProfile, setBioProfile] = useState([]);
   // const [isLoading, setIsLoading] = useState(false);
-  const {getBioProfile,bioProfile,isLoading, setIsLoading} = useContext(UserContext)
+  // const {getBioProfile,bioProfile,isLoading, setIsLoading} = useContext(UserContext)
 
   const token = localStorage.getItem("clientToken");
   const navigate = useNavigate();
 
-  // const getBioProfile = async () => {
-  //   try {
-  //     setIsLoading(true);
-  //     const request = await fetch(
-  //       "http://localhost:5782/api/v1/users",
-  //       {
-  //         headers: {
-  //           "Content-type": "application/json",
-  //           Authorization: `Bearer ${token}`,
-  //         },
-  //       }
-  //     );
-  //     const response = await request.json();
-  //     // console.log(response.user);
-  //     setBioProfile(response.user);
-  //   } catch (error) {
-  //     console.log(error.message);
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
+  const getBioProfile = async () => {
+    try {
+      // setIsLoading(true);
+      const request = await fetch(
+        "https://em-mern-social-app.onrender.com/api/v1/users",
+        {
+          headers: {
+            "Content-type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const response = await request.json();
+      // console.log(response.user);
+      setBioProfile(response.user);
+    } catch (error) {
+      console.log(error.message);
+    } finally {
+      // setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (!token) {
@@ -54,11 +54,7 @@ const Bio = () => {
 
         <div>
           {/* {isLoading && <SpinnerLoader/>} */}
-          {isLoading ? (
-            <div className="d-flex justify-content-center align-items-center vh-100">
-              <SpinnerLoader />
-            </div>
-          ) : (
+          {
             <>
               {/* profile div */}
               <div className="d-flex align-items-center gap-2">
@@ -128,7 +124,7 @@ const Bio = () => {
                 </p>
               </div>
             </>
-          )}
+          }
         </div>
       </main>
     </>

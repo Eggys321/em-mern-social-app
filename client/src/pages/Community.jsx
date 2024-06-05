@@ -142,7 +142,7 @@ const Community = () => {
   }, [token]);
   return (
     <>
-      {/* <Navbar /> */}
+      <Navbar />
 
       <main className="container">
         <div className=" row  gap-2 pt-3">

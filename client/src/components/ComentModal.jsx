@@ -5,6 +5,7 @@ import Button from "react-bootstrap/Button";
 import { comments } from "../db";
 import toast from "react-hot-toast";
 import TimeAgo from "./TimeAgo";
+import { Loader } from "../utils/Loader";
 import { SpinnerLoader } from "../utils/Loader";
 function CommentModal({ postId, show, onHide,onCommentAdded }) {
   const [comment, setComment] = useState("");
@@ -70,7 +71,7 @@ function CommentModal({ postId, show, onHide,onCommentAdded }) {
     }
   };
 
-  const btnTxt = isClicked ? <SpinnerLoader/>: "Post"
+  const btnTxt = isClicked ? <Loader/>: "Post"
 
   useEffect(() => {
     if (show) {
