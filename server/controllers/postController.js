@@ -951,7 +951,7 @@ const deletePost = async (req, res) => {
 // get comments for a post
 const getComments = async(req,res)=>{
   try {
-    const post = await POST.findById(req.params.postId).populate('comments.user', 'userName profilePhoto');
+    const post = await POST.findById(req.params.postId).populate('comments.user', 'userName profilePhoto').sort({createdAt:-1});
     if (!post) {
       return res.status(404).json({ success:false,message: 'Post not found.' });
     }
@@ -967,7 +967,7 @@ const getPostsByUser = async(req,res)=>{
   const {userId} = req.user
 
   try {
-    const post = await POST.find({user:userId}).populate({path:"user",select:"-password"});
+    const post = await POST.find({user:userId}).populate({path:"user",select:"-password"}).sort({createdAt:-1});
     res.status(200).json({success:true,message:"users post",post})
   } catch (error) {
     res.status(500).json(error.message)

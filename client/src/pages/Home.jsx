@@ -25,6 +25,8 @@ const Home = () => {
   const [likedPosts, setLikedPosts] = useState({});
   const [likeCounts, setLikeCounts] = useState({});
   const [currentPostId, setCurrentPostId] = useState(null);
+  // const [currentUser, setCurrentUser] = useState(null);
+
 
   const userId = localStorage.getItem("userId");
 
@@ -34,6 +36,7 @@ const Home = () => {
     useContext(UserContext);
   const navigate = useNavigate();
   const token = localStorage.getItem("clientToken");
+  console.log(timeLine);
 
   // const handleLike = async (postId) => {
   //   try {
@@ -68,17 +71,19 @@ const Home = () => {
   //   }
   // };
 
-
   // second
   const handleLike = async (postId) => {
     try {
-      const response = await fetch(`https://em-mern-social-app.onrender.com/api/v1/posts/like-post/${postId}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await fetch(
+        `https://em-mern-social-app.onrender.com/api/v1/posts/like-post/${postId}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       const data = await response.json();
       if (response.ok) {
         const updatedLikedPosts = { ...likedPosts };
@@ -86,7 +91,9 @@ const Home = () => {
         updatedLikedPosts[postId] = updatedLikedPosts[postId] || [];
         // Add or remove the user's ID from the likedPosts array for the post
         if (updatedLikedPosts[postId].includes(userId)) {
-          updatedLikedPosts[postId] = updatedLikedPosts[postId].filter(id => id !== userId);
+          updatedLikedPosts[postId] = updatedLikedPosts[postId].filter(
+            (id) => id !== userId
+          );
         } else {
           updatedLikedPosts[postId].push(userId);
         }
@@ -135,7 +142,34 @@ const Home = () => {
     },
   });
   // console.log("errors", errors);
+  const handleUnfollow = async (userId) => {
+    // if (!currentUser) return;
 
+    try {
+      const response = await fetch(
+        `https://em-mern-social-app.onrender.com/api/v1/users/unfollow/${userId}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          // body: JSON.stringify({ userId: currentUser._id }),
+        }
+      );
+      const result = await response.json();
+      console.log(result);
+      if (result.success) {
+        getTimeLine()
+       
+        toast.success(result.message);
+      } else {
+        toast.error(result.message);
+      }
+    } catch (error) {
+      console.error("Failed to unfollow user:", error);
+    }
+  };
   const handlePost = async (data) => {
     try {
       const request = await fetch(
@@ -170,9 +204,9 @@ const Home = () => {
     setModalShow(true);
   };
 
-  const handleCommentAdded=()=>{
-    getTimeLine()
-  }
+  const handleCommentAdded = () => {
+    getTimeLine();
+  };
   useEffect(() => {
     if (!token) {
       toast.error("unauthorized,sign in");
@@ -202,17 +236,20 @@ const Home = () => {
       <div className="home-wrapper">
         <div className="container">
           <main className=" row home-main gap-2 pt-3">
-            <section style={{height:"45rem"}} className=" col-lg-4 d-none d-lg-block p-2 rounded-2 border profile-section ">
+            <section
+              style={{ height: "45rem" }}
+              className=" col-md-4 d-none d-md-block p-2 rounded-2 border profile-section "
+            >
               <Bio />
             </section>
 
             {/* news-field col */}
 
-            <section className="col-lg">
+            <section className="col-md">
               {/* top div */}
-              <div className="p-2 top-news-field rounded-2 mb-2 border ">
+              <div className="p-2 top-news-field rounded-2 mb-2 border position-relative">
                 {/*  */}
-                <form onSubmit={handleSubmit(handlePost)} className="w-100">
+                <form onSubmit={handleSubmit(handlePost)} className="w-100 ">
                   <div className="d-flex gap-2 align-items-center">
                     <img
                       src={bioProfile?.profilePhoto}
@@ -221,23 +258,22 @@ const Home = () => {
                       style={{
                         borderRadius: "100%",
                         height: "4rem",
-                        width: "4rem",
+                        width: "6rem",
                       }}
                     />
 
                     <input
                       type="text"
                       className="rounded-pill ps-2 post-input w-100"
-                      placeholder="What do you want to ask or share?"
+                      placeholder="What do you want to share?"
                       {...register("text", { required: true })}
                     />
                   </div>
                   {/*  */}
                   <div className=" d-flex align-items-center justify-content-between mt-1">
                     <div className="d-flex justify-content-between home-post-error-state align-items-center">
-                      <Post />
-                      <div>
-                        <span className="text-danger   fs-6 text-start fw-bold">
+                      <div className="w-100 text-end m-auto">
+                        <span className="text-danger   fs-6  fw-bold">
                           {errors.text?.message}
                         </span>
                       </div>
@@ -250,30 +286,41 @@ const Home = () => {
                     </button>
                   </div>
                 </form>
+                <div className="position-absolute top-50  mt-3">
+                  <Post />
+                </div>
               </div>
 
               <div>
                 <CommentModal
                   show={modalShow}
                   postId={currentPostId}
-
                   onHide={() => setModalShow(false)}
                   onCommentAdded={handleCommentAdded}
                 />
-                {timeLine.length < 1 && <p className="fs-5  fw-bold">No posts yet,create a post or follow others to see posts on your timeline👌</p>}
+                {timeLine.length < 1 && (
+                  <p className="fs-5  fw-bold">
+                    No posts yet,create a post or follow others to see posts on
+                    your timeline👌
+                  </p>
+                )}
                 {timeLine?.map((person) => {
                   const { _id, name, time, post, profileImg, postImg, follow } =
                     person;
-                    const isLiked = likedPosts[_id] && likedPosts[_id].includes(userId); 
-                    const likeCount = likeCounts[_id] || 0;
+                  const isLiked =
+                    likedPosts[_id] && likedPosts[_id].includes(userId);
+                  const likeCount = likeCounts[_id] || 0;
+                  const isOwnPost = person.user._id === userId; // Check if the post belongs to the current user
+
                   return (
                     <div key={_id} className="p-2 mb-3 rounded-2 scroll-page">
                       {/* top div */}
+                      {/* <h2> {person.user._id} </h2> */}
                       <div className="d-flex justify-content-between align-items-center ">
                         {/* img and time */}
                         <div className="d-flex gap-2 align-items-center">
                           <img
-                            src={person.user.profilePhoto}
+                            src={bioProfile?.profilePhoto}
                             alt=""
                             className="profile-img "
                             style={{
@@ -292,10 +339,13 @@ const Home = () => {
 
                         {/* btn-div */}
                         <div>
-                          <button className="btn btn-white btn-sm rounded-pill border px-2">
-                            {/* {person?.user?.following} */}
-                            {/* {!person.user.following ? "follow": "following"} */}
-                          </button>
+                          {!isOwnPost && (
+                            <div>
+                              <button  className="btn rounded-5 border" onClick={()=>handleUnfollow(person.user._id)}>
+                                Following
+                              </button>
+                            </div>
+                          )}
                         </div>
                       </div>
 
@@ -325,14 +375,17 @@ const Home = () => {
                               role="button"
                             />
                           </div>
-                            <div className="mt-2">{likeCount} like(s)</div>{" "}
+                          <div className="mt-2">{likeCount} like(s)</div>{" "}
                           <div
                             show={modalShow}
                             onClick={() => openCommentModal(_id)}
                           >
                             <img src={commentImg} alt="" role="button" />
                           </div>
-                          <p className="mt-2"> {person.commentsCount} comment(s) </p>
+                          <p className="mt-2">
+                            {" "}
+                            {person.commentsCount} comment(s){" "}
+                          </p>
                         </div>
 
                         {/* share */}

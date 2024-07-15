@@ -17,6 +17,8 @@ import { useNavigate } from "react-router-dom";
 import {Loader} from "../utils/Loader";
 import toast from "react-hot-toast";
 import UserContext from "../context/UserContext";
+import { useQueryClient } from "@tanstack/react-query";
+
 
 function EditProfileModal(props) {
   // const [bioProfile, setBioProfile] = useState([]);
@@ -58,6 +60,8 @@ function EditProfileModal(props) {
 
   const token = localStorage.getItem("clientToken");
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
 
   // const getBioProfile = async () => {
   //   try {
@@ -135,7 +139,11 @@ function EditProfileModal(props) {
 
   const btnText = isCLicked ? <Loader/> : "Continue";
 
-
+  const handleProfileUpdate = async (e) => {
+    e.preventDefault();
+    await handleSubmit(e);
+    queryClient.invalidateQueries(["bioProfile", token]);
+  };
   useEffect(() => {
     if (!token) {
       toast.error("unauthorized,sign in");
@@ -160,8 +168,9 @@ function EditProfileModal(props) {
               <form
                 className="edit-form row  justify-content-between align-items-center w-100 gap-4"
                 encType="multipart/form-data"
-                onSubmit={handleSubmit}
+                onSubmit={handleProfileUpdate}
               >
+                {/* onSubmit={handleSubmit} */}
                 {/* first section */}
                 <section className="col-md-6">
                   <h5 className="mt-3 basic-h5 ms-0">Basic Information</h5>

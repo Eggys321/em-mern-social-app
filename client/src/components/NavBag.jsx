@@ -8,17 +8,13 @@ import UserContext from "../context/UserContext";
 const NavBag = () => {
   const [modalShow, setModalShow] = useState(false);
   const {logOut} = useContext(UserContext)
-  const navigate = useNavigate()
-  // const logOut = ()=>{
-  //   localStorage.removeItem("clientToken")
-  //   navigate("/signin")
-  // }
+  
 
   return (
     <>
       <EditProfileModal show={modalShow} onHide={() => setModalShow(false)} />
 
-      <section className="bg-gradient-secondary rounded-2 border p-2 shadow-lg ">
+      <section className="bg-gradient-secondary rounded-2 border p-2 shadow-lg position-relative z-2 ">
         {/* Edit */}
         <div className="mb-4">
           <div

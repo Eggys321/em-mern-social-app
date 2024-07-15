@@ -50,7 +50,7 @@ function ResponsiveExample() {
   return (
     <>
     <div className="off-div">
-    <img src={bioProfile?.profilePhoto} alt='' className='profile-img  logo-img img-fluid off-img d-lg-none '  style={{borderRadius:"5rem", height:"2rem"}} onClick={handleShow}/>
+    <img src={bioProfile?.profilePhoto} alt='' className='profile-img  logo-img img-fluid off-img d-lg-none '  style={{borderRadius:"100%", height:"3rem", minWidth:"4.5rem"}} onClick={handleShow}/>
       {/* <img src={bioProfile?.profilePhoto} alt='' className='logo-img img-fluid off-img d-lg-none' onClick={handleShow} /> */}
       </div>
       <Offcanvas show={show} onHide={handleClose} responsive="lg">

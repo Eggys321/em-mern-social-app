@@ -110,13 +110,14 @@ const unfollowUser = async (req, res) => {
 const getSingleUser = async (req, res) => {
   const { userId } = req.params;
   try {
-    const user = await USER.findById(userId).select("-password");
+    const user = await USER.findById(userId).select("-password").populate("followers", "_id userName")
+    .populate("following", "_id userName");;
     if (!user) {
       res.status(404).json({ success: false, message: "user not found" });
       return;
     }
     // fetching user posts
-    const posts = await POST.find({user:userId});
+    const posts = await POST.find({user:userId}).sort({createdAt:-1});
 
     res.status(200).json({ success: true, message: "user profile", user,posts });
   } catch (error) {

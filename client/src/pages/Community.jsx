@@ -146,11 +146,11 @@ const Community = () => {
 
       <main className="container">
         <div className=" row  gap-2 pt-3">
-          <section style={{height:"45rem"}} className="col-lg-4 d-none d-lg-block p-2 rounded-2 border profile-section ">
+          <section style={{height:"45rem"}} className="col-md-4 d-none d-md-block p-2 rounded-2 border profile-section ">
             <Bio />
           </section>
           {/* all users */}
-          <div className="col-lg ">
+          <div className="col-md ">
             <div>
               {isLoading ? (
                 <div className="d-flex justify-content-center align-items-center vh-100 ">
@@ -175,7 +175,7 @@ const Community = () => {
                             alt=""
                             className="profile-img"
                             style={{
-                              borderRadius: "5rem",
+                              borderRadius: "100%",
                               height: "4rem",
                               width: "5rem",
                             }}

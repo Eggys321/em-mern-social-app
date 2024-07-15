@@ -14,30 +14,36 @@ import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import debounce from "lodash.debounce";
+import { useBioProfile } from "../hooks/useBioProfile";
 const Navbar = () => {
   // const [modalShow, setModalShow] = useState(false);
   const [bagShow, SetBagShow] = useState(false);
-  const [bioProfile, setBioProfile] = useState([]);
+  // const [bioProfile, setBioProfile] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState([]);
-
+  
+  
+  
+  
   const token = localStorage.getItem("clientToken");
+  const { data, error, isLoading } = useBioProfile(token);
+  const bioProfile = data?.user;
   const navigate = useNavigate();
-  const getBioProfile = async () => {
-    try {
-      const request = await fetch("https://em-mern-social-app.onrender.com/api/v1/users", {
-        headers: {
-          "Content-type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const response = await request.json();
-      // console.log(response.user);
-      setBioProfile(response.user);
-    } catch (error) {
-      console.log(error.message);
-    }
-  };
+  // const getBioProfile = async () => {
+  //   try {
+  //     const request = await fetch("https://em-mern-social-app.onrender.com/api/v1/users", {
+  //       headers: {
+  //         "Content-type": "application/json",
+  //         Authorization: `Bearer ${token}`,
+  //       },
+  //     });
+  //     const response = await request.json();
+  //     // console.log(response.user);
+  //     setBioProfile(response.user);
+  //   } catch (error) {
+  //     console.log(error.message);
+  //   }
+  // };
   function handleDrop() {
     !bagShow ? SetBagShow(true) : SetBagShow(false);
   }
@@ -88,7 +94,7 @@ const Navbar = () => {
       toast.error("unauthorized,sign in");
       navigate("/signin");
     }
-    getBioProfile();
+    // getBioProfile();
   }, []);
   return (
     <>
@@ -100,15 +106,19 @@ const Navbar = () => {
               <img src={logoImg} alt="" />
             </Link>
           </div>
+          <nav className="d-none d-lg-block">
+
+    </nav>
           <ProfileSection />
 
           <div className="position-relative">
             <input
               type="text"
               className="rounded-pill ps-5 search-box"
-              placeholder="search a user name"
+              placeholder="search a user"
               value={searchTerm}
               onChange={handleSearch}
+              style={{width:"100%"}}
             />
             <img
             loading="lazy"
@@ -142,7 +152,7 @@ const Navbar = () => {
 
         {/* profile section */}
 
-        <div className="d-none d-lg-block">
+        <div className="d-none d-md-block">
           <section className="d-flex gap-3 align-items-center position-relative">
             <div className="d-flex flex-column align-items-center">
               <Link to="/" className="text-decoration-none">
@@ -173,7 +183,7 @@ const Navbar = () => {
               <span className="d-flex">
                 Me
                 <span
-                  className="d-none d-lg-block"
+                  className="d-none d-md-block"
                   role="button"
                   onClick={handleDrop}
                 >
