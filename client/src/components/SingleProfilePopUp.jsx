@@ -44,8 +44,8 @@ function SinglProfilePopUp({ name, ...props }) {
       const response = await request.json();
       console.log(response.user.followers);
       console.log(response.user.following);
-      setFollowersUN(response?.user?.followers);
-      setFollowingUN(response?.user?.following);
+      // setFollowersUN(response?.user?.followers);
+      // setFollowingUN(response?.user?.following);
       setUserPosts(response.posts);
       setData(response.user);
     } catch (error) {
