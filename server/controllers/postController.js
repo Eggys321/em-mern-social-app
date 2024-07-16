@@ -840,33 +840,65 @@ const editPost = async (req, res) => {
 
 // delete post
 // === 4 =======
-const deletePost = async (req, res) => {
+const deletePost = async(req,res)=>{
+
   try {
-    const postId = req.params.postId;
+    const { postId } = req.params;
     const userId = req.user.userId;
-
-    // Find the post by ID
-    const post = await POST.findById(postId);
-
-    // Check if the post was found
+  
+    // Find the post by ID and check if the user is authorized to delete it
+    const post = await POST.findOne({ _id: postId, user: userId });
     if (!post) {
-      return res.status(404).json({ error: 'Post not found.' });
+        return res.status(404).json({ error: 'Post not found or you are not authorized to delete this post' });
     }
-
-    // Check if the user is the owner of the post
-    if (post.user.toString() !== userId) {
-      return res.status(403).json({success:false, message: 'You do not have permission to delete this post.' });
-    }
-
-    // Delete the post
-    await POST.deleteOne({ _id: postId });
-
-    res.status(200).json({ success: true, message: 'Post deleted successfully.' });
+  
+    // Remove the post
+    await POST.findByIdAndDelete(postId);
+  
+    // Remove likes and comments associated with the post
+    await POST.updateMany(
+        { "comments.post": postId },
+        { $pull: { comments: { post: postId } } }
+    );
+  
+    await POST.updateMany(
+        { "likes.post": postId },
+        { $pull: { likes: { post: postId } } }
+    );
+  
+    res.json({ message: 'Post deleted successfully' });
   } catch (error) {
-    // console.error('Error deleting post:', error);
-    res.status(500).json(error.message);
+    res.status(500).json({ error: 'Internal server error' });
   }
-};
+}
+// used immediate below b4 d above
+// const deletePost = async (req, res) => {
+//   try {
+//     const postId = req.params.postId;
+//     const userId = req.user.userId;
+
+//     // Find the post by ID
+//     const post = await POST.findById(postId);
+
+//     // Check if the post was found
+//     if (!post) {
+//       return res.status(404).json({ error: 'Post not found.' });
+//     }
+
+//     // Check if the user is the owner of the post
+//     if (post.user.toString() !== userId) {
+//       return res.status(403).json({success:false, message: 'You do not have permission to delete this post.' });
+//     }
+
+//     // Delete the post
+//     await POST.deleteOne({ _id: postId });
+
+//     res.status(200).json({ success: true, message: 'Post deleted successfully.' });
+//   } catch (error) {
+//     // console.error('Error deleting post:', error);
+//     res.status(500).json(error.message);
+//   }
+// };
 // === 3 =======
 // const deletePost = async (req, res) => {
 //   try {

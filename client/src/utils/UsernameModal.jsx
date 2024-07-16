@@ -39,7 +39,7 @@ function UsernameModal(props) {
             <div className="row gap-3 justify-content-between p-3">
               {followersUN.map((follower) => {
                 return (
-                  <div className="col-4 border" key={follower._id}>
+                  <div className="col-md-4 border" key={follower._id}>
                     <h4 className="text-break"> {follower.userName} </h4>
                   </div>
                 );

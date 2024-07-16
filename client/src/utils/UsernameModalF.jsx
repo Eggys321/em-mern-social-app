@@ -36,10 +36,10 @@ function UsernameModalF(props) {
       <Modal.Body>
         {followeringUN && followeringUN.length >= 1 ? (
           <>
-            <div className="row gap-3 justify-content-between p-3">
+            <div className="row gap-3 justify-content-between align-items-center p-3">
               {followeringUN.map((following) => {
                 return (
-                  <div className="col-4 border" key={following._id}>
+                  <div className="col-md-4 border" key={following._id}>
                     <h4 className="text-break"> {following.userName} </h4>
                   </div>
                 );

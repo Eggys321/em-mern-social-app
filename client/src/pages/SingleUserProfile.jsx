@@ -21,6 +21,15 @@ import UsernameModal from "../utils/UsernameModal";
 import UsernameModalF from "../utils/UsernameModalF";
 import Offcanvas from "react-bootstrap/Offcanvas";
 import SinglProfilePopUp from "../components/SingleProfilePopUp";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useForm } from "react-hook-form";
+import { postText } from "../utils/ValidationSchema";
+import CommentModal from "../components/ComentModal";
+import toast from "react-hot-toast";
+// import unLikeImg from "../assets/like-img.svg";
+import likeImg from "../assets/heart.jpg";
+
+
 
 const SingleUserProfile = () => {
   const [data, setData] = useState([]);
@@ -31,11 +40,130 @@ const SingleUserProfile = () => {
   const [modalShow, setModalShow] = useState(false);
   const [modalShowF, setModalShowF] = useState(false);
   const [showOffcanvas, setShowOffcanvas] = useState(false);
+  const [modalShowComm, setModalShowComm] = useState(false);
+  const [likedPosts, setLikedPosts] = useState({});
+  const [likeCounts, setLikeCounts] = useState({});
   const handleClose = () => setShowOffcanvas(false);
   const handleShow = () => setShowOffcanvas(true);
+  const [currentPostId, setCurrentPostId] = useState(null);
+
+  
 
   const { userId } = useParams();
-  console.log(userId);
+  const token = localStorage.getItem("clientToken");
+  const handleLike = async (postId) => {
+    try {
+      const response = await fetch(
+        `https://em-mern-social-app.onrender.com/api/v1/posts/like-post/${postId}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const data = await response.json();
+      if (response.ok) {
+        const updatedLikedPosts = { ...likedPosts };
+        // Initialize an empty array for the post if it doesn't exist in likedPosts
+        updatedLikedPosts[postId] = updatedLikedPosts[postId] || [];
+        // Add or remove the user's ID from the likedPosts array for the post
+        if (updatedLikedPosts[postId].includes(userId)) {
+          updatedLikedPosts[postId] = updatedLikedPosts[postId].filter(
+            (id) => id !== userId
+          );
+        } else {
+          updatedLikedPosts[postId].push(userId);
+        }
+        setLikedPosts(updatedLikedPosts);
+        localStorage.setItem("likedPosts", JSON.stringify(updatedLikedPosts));
+        toast.success(data.message);
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      console.error("Error liking/unliking post:", error);
+      toast.error("Failed to like/unlike post. Please try again.");
+    }
+  };
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm({
+    resolver: yupResolver(postText),
+    defaultValues: {
+      text: "",
+    },
+  });
+
+  const handleUnfollow = async (userId) => {
+    // if (!currentUser) return;
+
+    try {
+      const response = await fetch(
+        `https://em-mern-social-app.onrender.com/api/v1/users/unfollow/${userId}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          // body: JSON.stringify({ userId: currentUser._id }),
+        }
+      );
+      const result = await response.json();
+      console.log(result);
+      if (result.success) {
+        getTimeLine()
+       
+        toast.success(result.message);
+      } else {
+        toast.error(result.message);
+      }
+    } catch (error) {
+      console.error("Failed to unfollow user:", error);
+    }
+  };
+
+  const handlePost = async (data) => {
+    try {
+      const request = await fetch(
+        "https://em-mern-social-app.onrender.com/api/v1/posts/create-post",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(data),
+        }
+      );
+      // getTimeLine()
+      const response = await request.json();
+      console.log(response);
+      if (response.success) {
+        reset();
+        toast.success(response.message);
+        getTimeLine();
+
+        // setTimeLine(prevTimeLine => [response.post, ...prevTimeLine]);
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+    }
+  };
+  const openCommentModal = (postId) => {
+    setCurrentPostId(postId);
+    setModalShowComm(true);
+  };
+  const handleCommentAdded = () => {
+    getTimeLine();
+  };
+  // console.log(userId);
   const getData = async () => {
     try {
       const request = await fetch(
@@ -59,6 +187,21 @@ const SingleUserProfile = () => {
   };
   useEffect(() => {
     getData();
+    if (!token) {
+      toast.error("unauthorized,sign in");
+      navigate("/signin");
+    }
+    const storedLikedPosts = JSON.parse(localStorage.getItem("likedPosts"));
+    if (storedLikedPosts) {
+      setLikedPosts(storedLikedPosts);
+    }
+
+    const counts = {};
+    // timeLine.forEach((post) => {
+    //   counts[post._id] = post.likes.length;
+    // });
+    setLikeCounts(counts);
+    // getTimeLine();
     document.title = "user | profile";
   }, []);
   return (
@@ -224,6 +367,12 @@ const SingleUserProfile = () => {
             {/* 00000 */}
             <section className="col-md">
               {/* <h2>single user</h2> */}
+              <CommentModal
+                  show={modalShowComm}
+                  postId={currentPostId}
+                  onHide={() => setModalShowComm(false)}
+                  onCommentAdded={handleCommentAdded}
+                />
 
               <div>
                 {userPosts.length < 1 && (
@@ -232,8 +381,9 @@ const SingleUserProfile = () => {
                 {userPosts?.map((person) => {
                   const { _id, name, time, post, profileImg, postImg, follow } =
                     person;
-                  // const isLiked = likedPosts[_id] && likedPosts[_id].includes(userId);
-                  // const likeCount = likeCounts[_id] || 0;
+                    const isLiked =
+                    likedPosts[_id] && likedPosts[_id].includes(userId);
+                  const likeCount = likeCounts[_id] || 0;
                   return (
                     <div key={_id} className="p-2 mb-3 rounded-2 scroll-page">
                       {/* top div */}
@@ -291,9 +441,12 @@ const SingleUserProfile = () => {
 
                         <div className="d-flex gap-2 ">
                           <div onClick={() => handleLike(_id)}>
-                            <img src={unLikeImg} alt="" role="button" />
-                          </div>
-                          {/* <div className="mt-2">{likeCount} like(s)</div>{" "} */}
+                          <img
+                              src={isLiked ? likeImg : unLikeImg}
+                              alt=""
+                              role="button"
+                            />                          </div>
+                          <div className="mt-2">{likeCount} like(s)</div>{" "}
                           <div
                             // show={modalShow}
                             onClick={() => openCommentModal(_id)}
