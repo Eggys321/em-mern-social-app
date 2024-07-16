@@ -7,7 +7,7 @@ function UsernameModal(props) {
   const getData = async () => {
     try {
       const request = await fetch(
-        `http://localhost:5782/api/v1/users/userprofile/${props.user}`
+        `https://em-mern-social-app.onrender.com/api/v1/users/userprofile/${props.user}`
       );
       const response = await request.json();
 
