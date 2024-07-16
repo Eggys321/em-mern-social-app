@@ -36,7 +36,7 @@ const Home = () => {
     useContext(UserContext);
   const navigate = useNavigate();
   const token = localStorage.getItem("clientToken");
-  console.log(timeLine);
+  // console.log(timeLine);
 
   // const handleLike = async (postId) => {
   //   try {
@@ -313,14 +313,14 @@ const Home = () => {
                   const isOwnPost = person.user._id === userId; // Check if the post belongs to the current user
 
                   return (
-                    <div key={_id} className="p-2 mb-3 rounded-2 scroll-page">
+                    <div key={_id} className="p-2 mb-3 rounded-2 scroll-page position-relative">
                       {/* top div */}
                       {/* <h2> {person.user._id} </h2> */}
                       <div className="d-flex justify-content-between align-items-center ">
                         {/* img and time */}
                         <div className="d-flex gap-2 align-items-center">
                           <img
-                            src={bioProfile?.profilePhoto}
+                            src={person?.user?.profilePhoto}
                             alt=""
                             className="profile-img "
                             style={{
@@ -348,6 +348,19 @@ const Home = () => {
                           )}
                         </div>
                       </div>
+                      <div className="d-flex justify-content-end  position-absolute top-0 end-0  pe-4 pt-3">
+                          {isOwnPost && (
+                            <div>
+                              {/* <button  className="btn rounded-5 border" onClick={()=>handleUnfollow(person.user._id)}>
+                                Following
+                              </button> */}
+                              <p role="button" className="fs-2">
+                              ...
+                                 
+                              </p>
+                            </div>
+                          )}
+                        </div>
 
                       {/* post */}
                       <p>{person.text}</p>

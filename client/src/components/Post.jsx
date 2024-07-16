@@ -66,6 +66,12 @@ function Post() {
   };
 
   const handleFileChange = (event) => {
+    if (event.target.files && event.target.files[0]) {
+      if (event.target.files[0].size > 2 * 1000 * 1000) {
+        toast.error("File with maximum size of 2MB is allowed");
+        return false;
+      }
+    }
     const file = event.target.files[0];
     setValue('imagePath', file, { shouldValidate: true });
     if (file) {
@@ -77,6 +83,7 @@ function Post() {
     } else {
       setPreview(prevImg);
     }
+    
   };
 
   return (
@@ -99,11 +106,14 @@ function Post() {
             </FloatingLabel>
 
             <Form.Group controlId="formFileLg" className="mb-3">
+              <div style={{width:"100%",minHeight:"3rem"}}>
               <img
+              style={{height:"240px",width:""}}
                    src={preview}
                    alt=""
-                   className="w-75 rounded shadow my-3 "
+                   className="img-fluid rounded shadow my-3 "
                  />
+              </div>
               <Form.Control
                 type="file"
                 size="lg"
@@ -112,13 +122,16 @@ function Post() {
               {errors.imagePath && <p className="text-danger">{errors.imagePath.message}</p>}
             </Form.Group>
 
-            <div className="text-end">
+            <div className=" d-flex justify-content-end gap-2 ">
               <button
                 type="submit"
                 disabled={isSubmitting}
                 className="btn mt-3 px-4 rounded-pill btn-primary btn-sm"
               >
                 Post
+              </button>
+              <button onClick={()=> reset()} className="btn mt-3 px-4 rounded-pill btn-danger btn-sm">
+                Cancel
               </button>
             </div>
           </Modal.Body>

@@ -58,6 +58,12 @@ export const  UserProvider = ({ children })=>{
 
   // file change ftn
   const handleFileChange = (event) => {
+    if (event.target.files && event.target.files[0]) {
+      if (event.target.files[0].size > 2 * 1000 * 1000) {
+        toast.error("File with maximum size of 2MB is allowed");
+        return false;
+      }
+    }
     const file = event.target.files[0];
     setSelectedFile(file);
 
@@ -133,7 +139,7 @@ export const  UserProvider = ({ children })=>{
           },
       });
       const response = await request.json();
-      console.log(response.posts);
+      // console.log(response.posts);
       setTimeLine(response?.posts || []); 
       
   } catch (error) {
