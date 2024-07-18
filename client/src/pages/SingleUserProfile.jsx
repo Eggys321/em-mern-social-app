@@ -29,8 +29,6 @@ import toast from "react-hot-toast";
 // import unLikeImg from "../assets/like-img.svg";
 import likeImg from "../assets/heart.jpg";
 
-
-
 const SingleUserProfile = () => {
   const [data, setData] = useState([]);
   const [userPosts, setUserPosts] = useState([]);
@@ -46,8 +44,6 @@ const SingleUserProfile = () => {
   const handleClose = () => setShowOffcanvas(false);
   const handleShow = () => setShowOffcanvas(true);
   const [currentPostId, setCurrentPostId] = useState(null);
-
-  
 
   const { userId } = useParams();
   const token = localStorage.getItem("clientToken");
@@ -100,8 +96,6 @@ const SingleUserProfile = () => {
   });
 
   const handleUnfollow = async (userId) => {
-    // if (!currentUser) return;
-
     try {
       const response = await fetch(
         `https://em-mern-social-app.onrender.com/api/v1/users/unfollow/${userId}`,
@@ -111,14 +105,13 @@ const SingleUserProfile = () => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          // body: JSON.stringify({ userId: currentUser._id }),
         }
       );
       const result = await response.json();
       console.log(result);
       if (result.success) {
-        getTimeLine()
-       
+        getTimeLine();
+
         toast.success(result.message);
       } else {
         toast.error(result.message);
@@ -141,15 +134,12 @@ const SingleUserProfile = () => {
           body: JSON.stringify(data),
         }
       );
-      // getTimeLine()
       const response = await request.json();
       console.log(response);
       if (response.success) {
         reset();
         toast.success(response.message);
         getTimeLine();
-
-        // setTimeLine(prevTimeLine => [response.post, ...prevTimeLine]);
       }
     } catch (error) {
       console.log(error);
@@ -182,7 +172,7 @@ const SingleUserProfile = () => {
   };
   // Function to ensure the URL is properly formed
   const formatUrl = (url) => {
-    if (!url) return "";
+    if (!url) return
     return url.startsWith("http") ? url : `https://${url}`;
   };
   useEffect(() => {
@@ -197,11 +187,7 @@ const SingleUserProfile = () => {
     }
 
     const counts = {};
-    // timeLine.forEach((post) => {
-    //   counts[post._id] = post.likes.length;
-    // });
     setLikeCounts(counts);
-    // getTimeLine();
     document.title = "user | profile";
   }, []);
   return (
@@ -215,14 +201,14 @@ const SingleUserProfile = () => {
             style={{ borderRadius: "100%", height: "3rem", minWidth: "4.5rem" }}
             onClick={handleShow}
           />
-         <div className="d-md-none">
-         <input
-            type="text"
-            className="rounded-pill ps-5 search-box"
-            placeholder="search a user"
-            style={{ width: "100%" }}
-          />{" "}
-         </div>
+          <div className="d-md-none">
+            <input
+              type="text"
+              className="rounded-pill ps-5 search-box"
+              placeholder="search a user"
+              style={{ width: "100%" }}
+            />{" "}
+          </div>
           <div className="d-none">
             <SinglProfilePopUp
               show={showOffcanvas}
@@ -358,21 +344,13 @@ const SingleUserProfile = () => {
                 </div>
               </div>
             </section>
-            {/* <section className='vh-100 col-lg-4 d-none d-lg-block p-2 rounded-2 border profile-section '>
-                <img src={data?.profilePhoto} alt="" className='w-25' />
-                <p> {data?.location} </p>
-                <h3> {data?.following?.length} following</h3>
-                <h3> {data?.followers?.length} followers</h3>
-            </section> */}
-            {/* 00000 */}
             <section className="col-md">
-              {/* <h2>single user</h2> */}
               <CommentModal
-                  show={modalShowComm}
-                  postId={currentPostId}
-                  onHide={() => setModalShowComm(false)}
-                  onCommentAdded={handleCommentAdded}
-                />
+                show={modalShowComm}
+                postId={currentPostId}
+                onHide={() => setModalShowComm(false)}
+                onCommentAdded={handleCommentAdded}
+              />
 
               <div>
                 {userPosts.length < 1 && (
@@ -381,7 +359,7 @@ const SingleUserProfile = () => {
                 {userPosts?.map((person) => {
                   const { _id, name, time, post, profileImg, postImg, follow } =
                     person;
-                    const isLiked =
+                  const isLiked =
                     likedPosts[_id] && likedPosts[_id].includes(userId);
                   const likeCount = likeCounts[_id] || 0;
                   return (
@@ -414,8 +392,6 @@ const SingleUserProfile = () => {
                         {/* btn-div */}
                         <div>
                           <button className="btn btn-white btn-sm rounded-pill border px-2">
-                            {/* {person?.user?.following} */}
-                            {/* {!person.user.following ? "follow": "following"} */}
                             follow
                           </button>
                         </div>
@@ -425,13 +401,10 @@ const SingleUserProfile = () => {
                       <p>{person.text}</p>
 
                       {/* post-img */}
-                      {/* <img src={person.imagePath} className="w-100" alt="" /> */}
                       <LazyLoadImage
-                        // alt={image.alt}
                         height={"100%"}
                         width={"100%"}
                         effect="blur"
-                        // className="w-100"
                         src={person.imagePath}
                       />
 
@@ -441,16 +414,14 @@ const SingleUserProfile = () => {
 
                         <div className="d-flex gap-2 ">
                           <div onClick={() => handleLike(_id)}>
-                          <img
+                            <img
                               src={isLiked ? likeImg : unLikeImg}
                               alt=""
                               role="button"
-                            />                          </div>
-                          <div className="mt-2">{likeCount} like(s)</div>{" "}
-                          <div
-                            // show={modalShow}
-                            onClick={() => openCommentModal(_id)}
-                          >
+                            />
+                          </div>
+                          <div className="mt-2">{likeCount} like(s)</div>
+                          <div onClick={() => openCommentModal(_id)}>
                             <img src={commentImg} alt="" role="button" />
                           </div>
                           <p className="mt-2">

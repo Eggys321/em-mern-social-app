@@ -19,14 +19,17 @@ import { useForm } from "react-hook-form";
 import UserContext from "../context/UserContext";
 import TimeAgo from "../components/TimeAgo";
 import { LazyLoadImage } from "react-lazy-load-image-component";
+import { SpinnerLoader } from "../utils/Loader";
 
 const Home = () => {
   const [modalShow, setModalShow] = useState(false);
   const [likedPosts, setLikedPosts] = useState({});
   const [likeCounts, setLikeCounts] = useState({});
   const [currentPostId, setCurrentPostId] = useState(null);
-  // const [currentUser, setCurrentUser] = useState(null);
+  const [isTrue, setIsTrue] = useState(!false);
+  const [showOptionsPostId, setShowOptionsPostId] = useState(null);
 
+  // const [currentUser, setCurrentUser] = useState(null);
 
   const userId = localStorage.getItem("userId");
 
@@ -108,6 +111,38 @@ const Home = () => {
       toast.error("Failed to like/unlike post. Please try again.");
     }
   };
+
+  function toggleShow(postId) {
+    setShowOptionsPostId((prevPostId) =>
+      prevPostId === postId ? null : postId
+    );
+    // isTrue ?  setIsTrue(false) : setIsTrue(true)
+  }
+
+  async function handleDeletePost(postIdx) {
+    try {
+      const req = await fetch(
+        `https://em-mern-social-app.onrender.com/api/v1/posts/delete-post/${postIdx}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const res = await req.json();
+      if(res){
+        toast.success(res.message)
+      }
+      console.log(res);
+      setTimeLine(timeLine.filter((existingDatum) => existingDatum._id !== postIdx));
+
+    } catch (error) {
+      console.log(error);
+    }
+  }
   // timeline
 
   // const getBioProfile = async () => {
@@ -160,8 +195,8 @@ const Home = () => {
       const result = await response.json();
       console.log(result);
       if (result.success) {
-        getTimeLine()
-       
+        getTimeLine();
+
         toast.success(result.message);
       } else {
         toast.error(result.message);
@@ -247,7 +282,7 @@ const Home = () => {
 
             <section className="col-md">
               {/* top div */}
-              <div className="p-2 top-news-field rounded-2 mb-2 border position-relative">
+              <div className="p-2 top-news-field rounded-2 mb-2 border position-relative z-2">
                 {/*  */}
                 <form onSubmit={handleSubmit(handlePost)} className="w-100 ">
                   <div className="d-flex gap-2 align-items-center">
@@ -313,10 +348,12 @@ const Home = () => {
                   const isOwnPost = person.user._id === userId; // Check if the post belongs to the current user
 
                   return (
-                    <div key={_id} className="p-2 mb-3 rounded-2 scroll-page position-relative">
+                    <div
+                      key={_id}
+                      className="p-2 mb-3 rounded-2 scroll-page position-relative"
+                    >
                       {/* top div */}
-                      {/* <h2> {person.user._id} </h2> */}
-                      <div className="d-flex justify-content-between align-items-center ">
+                      <div className="d-flex justify-content-between align-items-center  ">
                         {/* img and time */}
                         <div className="d-flex gap-2 align-items-center">
                           <img
@@ -341,38 +378,46 @@ const Home = () => {
                         <div>
                           {!isOwnPost && (
                             <div>
-                              <button  className="btn rounded-5 border" onClick={()=>handleUnfollow(person.user._id)}>
+                              <button
+                                className="btn rounded-5 border"
+                                onClick={() => handleUnfollow(person.user._id)}
+                              >
                                 Following
                               </button>
                             </div>
                           )}
                         </div>
                       </div>
-                      <div className="d-flex justify-content-end  position-absolute top-0 end-0  pe-4 pt-3">
-                          {isOwnPost && (
-                            <div>
-                              {/* <button  className="btn rounded-5 border" onClick={()=>handleUnfollow(person.user._id)}>
-                                Following
-                              </button> */}
-                              <p role="button" className="fs-2">
+                      <div className="d-flex justify-content-end  position-absolute top-0 end-0 position-relative  pe-4 pt-3">
+                        {isOwnPost && (
+                          <div onClick={() => toggleShow(_id)}>
+                            <p role="button" className="fs-2">
                               ...
-                                 
-                              </p>
-                            </div>
-                          )}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                      {showOptionsPostId === _id && (
+                        <div className="shadow rounded w-25 text-center position-absolute top-50 end-0 translate-middle-y me-5 border z-2 bg-light">
+                          <p
+                            className="text-danger"
+                            role="button"
+                            onClick={() => handleDeletePost(_id)}
+                          >
+                            Delete
+                          </p>
+                          <p className="text-success">Edit</p>
                         </div>
+                      )}
 
                       {/* post */}
                       <p>{person.text}</p>
 
                       {/* post-img */}
-                      {/* <img src={person.imagePath} className="w-100" alt="" /> */}
                       <LazyLoadImage
-                        // alt={image.alt}
                         height={"100%"}
                         width={"100%"}
                         effect="blur"
-                        // className="w-100"
                         src={person.imagePath}
                       />
 
@@ -410,21 +455,6 @@ const Home = () => {
                   );
                 })}
               </div>
-
-              {/* data base components */}
-              {/* <div className=' rounded-2 '>
-                
-                {people.map((person) => {
-                  const { id, name, time, post, profileImg, postImg } = person;
-                  <div key={id} >
-                    <img src={profileImg} alt='' />
-                    <span className='fw-bold'>{name}</span>
-                    <span className='fs-5'>{time}</span>
-                    <p>{post}</p>
-                    <img src={postImg} alt='' />
-                  </div>;
-                })}
-              </div> */}
             </section>
           </main>
         </div>

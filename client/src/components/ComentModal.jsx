@@ -65,7 +65,7 @@ function CommentModal({ postId, show, onHide,onCommentAdded }) {
         toast.error(data.message);
       }
     } catch (error) {
-      toast.error("Failed to add comment. Please try again.");
+      // toast.error("Failed to add comment. Please try again.");
     }finally{
       setIsClicked(false)
     }

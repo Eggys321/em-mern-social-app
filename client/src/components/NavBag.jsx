@@ -5,6 +5,7 @@ import logOutImg from "../assets/logout-img.svg";
 import { Link, useNavigate } from "react-router-dom";
 import EditProfileModal from "./EditProfileModal";
 import UserContext from "../context/UserContext";
+import "../styles/NavBag.css"
 const NavBag = () => {
   const [modalShow, setModalShow] = useState(false);
   const {logOut} = useContext(UserContext)
@@ -14,7 +15,7 @@ const NavBag = () => {
     <>
       <EditProfileModal show={modalShow} onHide={() => setModalShow(false)} />
 
-      <section className="bg-gradient-secondary rounded-2 border p-2 shadow-lg position-relative z-2 ">
+      <section className="navbag-container rounded-2 border p-2 shadow-lg position-relative z-3 ">
         {/* Edit */}
         <div className="mb-4">
           <div
