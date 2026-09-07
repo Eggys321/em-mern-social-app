@@ -1,348 +1,157 @@
-import React, { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Navbar from "../layouts/Navbar";
 import NavSection from "../components/NavSection";
-import profileImg from "../assets/yuji-img.svg";
-import locationImg from "../assets/location.svg";
-import realtorImg from "../assets/realtor.svg";
-import linkedinImg from "../assets/linkedin.svg";
-import twitterImg from "../assets/twitter.svg";
 import unLikeImg from "../assets/like-img.svg";
+import likeImg from "../assets/heart-filled.svg";
 import shareImg from "../assets/share-img.svg";
-import followersImg from "../assets/followers.svg";
-import likesImg from "../assets/likes.svg";
-import followingImg from "../assets/following.svg";
 import TimeAgo from "../components/TimeAgo";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import commentImg from "../assets/comment-image.svg";
-import Button from "react-bootstrap/Button";
-import Modal from "react-bootstrap/Modal";
-import UsernameModal from "../utils/UsernameModal";
-import UsernameModalF from "../utils/UsernameModalF";
-import Offcanvas from "react-bootstrap/Offcanvas";
-import SinglProfilePopUp from "../components/SingleProfilePopUp";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { useForm } from "react-hook-form";
-import { postText } from "../utils/ValidationSchema";
+import FollowListModal from "../components/FollowListModal";
+import SingleProfilePopUp from "../components/SingleProfilePopUp";
+import ProfileSidebar from "../components/ProfileSidebar";
+import UserSearchBox from "../components/UserSearchBox";
 import CommentModal from "../components/ComentModal";
 import toast from "react-hot-toast";
-// import unLikeImg from "../assets/like-img.svg";
-import likeImg from "../assets/heart.jpg";
+import Seo from "../components/Seo";
+import EmptyState from "../components/EmptyState";
+import { SpinnerLoader } from "../utils/Loader";
+import { get, post } from "../api/client";
 
 const SingleUserProfile = () => {
   const [data, setData] = useState([]);
   const [userPosts, setUserPosts] = useState([]);
-  const [isLoading, setIsloading] = useState(false);
-  const [followersUN, setFollowersUN] = useState([]);
-  const [followingUN, setFollowingUN] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [modalShow, setModalShow] = useState(false);
   const [modalShowF, setModalShowF] = useState(false);
   const [showOffcanvas, setShowOffcanvas] = useState(false);
   const [modalShowComm, setModalShowComm] = useState(false);
-  const [likedPosts, setLikedPosts] = useState({});
-  const [likeCounts, setLikeCounts] = useState({});
+  const [currentPostId, setCurrentPostId] = useState(null);
   const handleClose = () => setShowOffcanvas(false);
   const handleShow = () => setShowOffcanvas(true);
-  const [currentPostId, setCurrentPostId] = useState(null);
 
   const { userId } = useParams();
-  const token = localStorage.getItem("clientToken");
+  const userIdOfViewer = localStorage.getItem("userId");
+
+  const getData = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const response = await get(`/users/userprofile/${userId}`, { auth: false });
+      setUserPosts(response.posts || []);
+      setData(response.user);
+    } catch (error) {
+      console.error("Failed to load profile:", error.message);
+      toast.error("Couldn't load this profile.");
+    } finally {
+      setIsLoading(false);
+    }
+  }, [userId]);
+
   const handleLike = async (postId) => {
     try {
-      const response = await fetch(
-        `https://em-mern-social-app.onrender.com/api/v1/posts/like-post/${postId}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
+      const result = await post(`/posts/like-post/${postId}`);
+      setUserPosts((prev) =>
+        prev.map((p) => {
+          if (p._id !== postId) return p;
+          const alreadyLiked = p.likes?.includes(userIdOfViewer);
+          const likes = alreadyLiked
+            ? p.likes.filter((id) => id !== userIdOfViewer)
+            : [...(p.likes || []), userIdOfViewer];
+          return { ...p, likes };
+        })
       );
-      const data = await response.json();
-      if (response.ok) {
-        const updatedLikedPosts = { ...likedPosts };
-        // Initialize an empty array for the post if it doesn't exist in likedPosts
-        updatedLikedPosts[postId] = updatedLikedPosts[postId] || [];
-        // Add or remove the user's ID from the likedPosts array for the post
-        if (updatedLikedPosts[postId].includes(userId)) {
-          updatedLikedPosts[postId] = updatedLikedPosts[postId].filter(
-            (id) => id !== userId
-          );
-        } else {
-          updatedLikedPosts[postId].push(userId);
-        }
-        setLikedPosts(updatedLikedPosts);
-        localStorage.setItem("likedPosts", JSON.stringify(updatedLikedPosts));
-        toast.success(data.message);
-      } else {
-        toast.error(data.message);
-      }
+      toast.success(result.message);
     } catch (error) {
-      console.error("Error liking/unliking post:", error);
+      console.error("Error liking/unliking post:", error.message);
       toast.error("Failed to like/unlike post. Please try again.");
     }
   };
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors, isSubmitting },
-  } = useForm({
-    resolver: yupResolver(postText),
-    defaultValues: {
-      text: "",
-    },
-  });
 
-  const handleUnfollow = async (userId) => {
+  const handleUnfollow = async (targetUserId) => {
     try {
-      const response = await fetch(
-        `https://em-mern-social-app.onrender.com/api/v1/users/unfollow/${userId}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      const result = await response.json();
-      console.log(result);
+      const result = await post(`/users/unfollow/${targetUserId}`);
       if (result.success) {
-        getTimeLine();
-
+        getData();
         toast.success(result.message);
       } else {
         toast.error(result.message);
       }
     } catch (error) {
-      console.error("Failed to unfollow user:", error);
+      console.error("Failed to unfollow user:", error.message);
+      toast.error(error.message);
     }
   };
 
-  const handlePost = async (data) => {
-    try {
-      const request = await fetch(
-        "https://em-mern-social-app.onrender.com/api/v1/posts/create-post",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(data),
-        }
-      );
-      const response = await request.json();
-      console.log(response);
-      if (response.success) {
-        reset();
-        toast.success(response.message);
-        getTimeLine();
-      }
-    } catch (error) {
-      console.log(error);
-    } finally {
-    }
-  };
   const openCommentModal = (postId) => {
     setCurrentPostId(postId);
     setModalShowComm(true);
   };
+
   const handleCommentAdded = () => {
-    getTimeLine();
+    getData();
   };
-  // console.log(userId);
-  const getData = async () => {
-    try {
-      const request = await fetch(
-        `https://em-mern-social-app.onrender.com/api/v1/users/userprofile/${userId}`
-      );
-      const response = await request.json();
-      console.log(response.user.followers);
-      console.log(response.user.following);
-      setFollowersUN(response?.user?.followers);
-      setFollowingUN(response?.user?.following);
-      setUserPosts(response.posts);
-      setData(response.user);
-    } catch (error) {
-    } finally {
-    }
-  };
-  // Function to ensure the URL is properly formed
-  const formatUrl = (url) => {
-    if (!url) return
-    return url.startsWith("http") ? url : `https://${url}`;
-  };
+
   useEffect(() => {
     getData();
-    if (!token) {
-      toast.error("unauthorized,sign in");
-      navigate("/signin");
-    }
-    const storedLikedPosts = JSON.parse(localStorage.getItem("likedPosts"));
-    if (storedLikedPosts) {
-      setLikedPosts(storedLikedPosts);
-    }
+  }, [getData]);
 
-    const counts = {};
-    setLikeCounts(counts);
-    document.title = "user | profile";
-  }, []);
   return (
     <>
-      <nav className="d-flex align-items-center container">
-        <div className="pt-2 pb-2 d-flex gap-2 align-items-center">
-          <img
-            src={data?.profilePhoto}
-            alt=""
-            className="profile-img logo-img img-fluid off-img d-lg-none"
-            style={{ borderRadius: "100%", height: "3rem", minWidth: "4.5rem" }}
+      <Seo
+        title={data?.userName || "Profile"}
+        description={data?.bio || "View this user's profile on EM."}
+        noIndex
+      />
+      <nav className="d-flex align-items-center container" aria-label="Mobile profile">
+        <div className="pt-2 pb-2 d-flex gap-2 align-items-center w-100">
+          <button
+            type="button"
+            className="btn p-0 border-0 bg-transparent d-lg-none flex-shrink-0"
+            aria-label="Open profile menu"
             onClick={handleShow}
-          />
-          <div className="d-md-none">
-            <input
-              type="text"
-              className="rounded-pill ps-5 search-box"
-              placeholder="search a user"
-              style={{ width: "100%" }}
-            />{" "}
-          </div>
-          <div className="d-none">
-            <SinglProfilePopUp
-              show={showOffcanvas}
-              onHide={handleClose}
-              name={data?.userName}
+          >
+            <img
+              src={data?.profilePhoto}
+              alt=""
+              aria-hidden="true"
+              className="avatar avatar-sm img-fluid"
             />
+          </button>
+          <UserSearchBox className="d-md-none" />
+          <div className="d-none">
+            <SingleProfilePopUp show={showOffcanvas} onHide={handleClose} name={data?.userName} />
           </div>
         </div>
       </nav>
       <div className="d-none d-lg-block">
         <Navbar />
       </div>
-      <main className="home-wrapper">
-        <UsernameModal
-          user={userId}
+      <main id="main-content" className="home-wrapper">
+        <FollowListModal
+          userId={userId}
           show={modalShow}
           onHide={() => setModalShow(false)}
+          listKey="followers"
+          title="Follower(s)"
+          emptyText="No follower(s) yet"
         />
-        <UsernameModalF
-          user={userId}
+        <FollowListModal
+          userId={userId}
           show={modalShowF}
           onHide={() => setModalShowF(false)}
+          listKey="following"
+          title="Following"
+          emptyText="Not following anyone yet"
         />
         <div className="container">
           <div className="row gap-2 py-3">
-            {/* profile col */}
-            <section
-              style={{ height: "50rem" }}
-              className="col-md-4 d-none d-md-block p-2 rounded-2  border profile-section "
-            >
-              {/* profile div */}
-              <div className="sticky-div-fp ">
-                <div className="d-flex align-items-center gap-2">
-                  <img
-                    src={data?.profilePhoto}
-                    alt=""
-                    className="profile-img w-25 "
-                    style={{ borderRadius: "100%", height: "6rem" }}
-                  />
-                  <div className="d-flex flex-column ">
-                    <span className=""> {data?.userName} </span>
-                    {/* <span className=''>0 friends</span> */}
-                  </div>
-                </div>
-                <hr />
-
-                {/* bio div */}
-                <div>
-                  <h4>Bio</h4>
-                  <p>{data?.bio}</p>
-                </div>
-                <hr />
-
-                {/* activities */}
-                <div>
-                  <h4>Activities</h4>
-                  <div className="d-flex align-items-center gap-2">
-                    <img src={followersImg} alt="" />{" "}
-                    <div className="d-flex justify-content-between w-100">
-                      <div>
-                        <span>Follower(s) </span>
-                      </div>
-                      <div
-                        className="text-decoration-underline text-secondary"
-                        role="button"
-                      >
-                        <span
-                          className=""
-                          show={modalShow}
-                          onClick={() => setModalShow(true)}
-                        >
-                          {data?.followers?.length}
-                          {/* Edit Profile */}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="d-flex align-items-center mt-2 gap-2">
-                    <img src={followingImg} alt="" />{" "}
-                    <div className="d-flex justify-content-between w-100">
-                      <div>
-                        <span>Following </span>
-                      </div>
-                      <div
-                        className="text-decoration-underline text-secondary"
-                        role="button"
-                      >
-                        <span
-                          className=""
-                          show={modalShowF}
-                          onClick={() => setModalShowF(true)}
-                        >
-                          {data?.following?.length}
-                          {/* Edit Profile */}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="d-flex align-items-center mt-2 gap-2">
-                    <img src={likesImg} alt="" /> <span>Likes</span>
-                  </div>
-                </div>
-                <hr />
-
-                {/* information */}
-                <div>
-                  <h4>Info</h4>
-                  <div className="d-flex align-items-center gap-2">
-                    <img src={locationImg} alt="" />{" "}
-                    <span> {data?.location} </span>
-                  </div>
-                  <div className="d-flex align-items-center mt-2 gap-2">
-                    <img src={realtorImg} alt="" />{" "}
-                    <span> {data?.occupation} </span>
-                  </div>
-                </div>
-                <hr />
-                {/* socials */}
-                <div>
-                  <h4>Socials</h4>
-                  <div className="d-flex align-items-center gap-2">
-                    <a href={formatUrl(data?.x)} target="_blank" rel="">
-                      <img src={twitterImg} alt="" />
-                    </a>{" "}
-                    <span> {data?.x} </span>
-                  </div>
-                  <div className="d-flex align-items-center mt-2 gap-2">
-                    <a href={formatUrl(data?.linkedIn)} target="_blank" rel="">
-                      <img src={linkedinImg} alt="" />
-                    </a>{" "}
-                    <span> {data?.linkedIn} </span>
-                  </div>
-                </div>
-              </div>
+            <section className="col-md-4 d-none d-md-block p-2 rounded-2 border profile-section">
+              <ProfileSidebar
+                data={data}
+                onShowFollowers={() => setModalShow(true)}
+                onShowFollowing={() => setModalShowF(true)}
+              />
             </section>
             <section className="col-md">
               <CommentModal
@@ -353,88 +162,88 @@ const SingleUserProfile = () => {
               />
 
               <div>
-                {userPosts.length < 1 && (
-                  <p className="fs-5  fw-bold text-center p-5">No Post yet👌</p>
+                {isLoading && userPosts.length < 1 && (
+                  <div className="d-flex justify-content-center py-5" role="status" aria-label="Loading posts">
+                    <SpinnerLoader />
+                  </div>
+                )}
+                {!isLoading && userPosts.length < 1 && (
+                  <EmptyState icon="📭" title="No posts yet">
+                    {data?.userName ? `${data.userName} hasn't posted anything yet.` : "Nothing to show yet."}
+                  </EmptyState>
                 )}
                 {userPosts?.map((person) => {
-                  const { _id, name, time, post, profileImg, postImg, follow } =
-                    person;
-                  const isLiked =
-                    likedPosts[_id] && likedPosts[_id].includes(userId);
-                  const likeCount = likeCounts[_id] || 0;
+                  const { _id } = person;
+                  const isLiked = Boolean(person.likes?.includes(userIdOfViewer));
+                  const likeCount = person.likes?.length || 0;
                   return (
-                    <div key={_id} className="p-2 mb-3 rounded-2 scroll-page">
-                      {/* top div */}
-                      <div className="d-flex justify-content-between align-items-center ">
-                        {/* img and time */}
-                        <div className="d-flex gap-2 align-items-center">
+                    <article key={_id} className="p-2 mb-3 rounded-2 scroll-page">
+                      <div className="d-flex justify-content-between align-items-center gap-2">
+                        <div className="d-flex gap-2 align-items-center" style={{ minWidth: 0 }}>
                           <img
                             src={data?.profilePhoto}
-                            alt=""
-                            className="profile-img "
-                            style={{
-                              borderRadius: "100%",
-                              height: "4rem",
-                              width: "5rem",
-                            }}
+                            alt={`${data?.userName}'s profile photo`}
+                            className="avatar avatar-md flex-shrink-0"
                           />
-                          <span className="d-flex flex-column justify-content-center ">
-                            <h5 className="pt-3">
-                              {" "}
-                              <span className=""> {data?.userName} </span>
-                            </h5>
-                            <p>
+                          <span className="d-flex flex-column justify-content-center" style={{ minWidth: 0 }}>
+                            <h5 className="pt-3 mb-0 text-truncate">{data?.userName}</h5>
+                            <p className="mb-0">
                               <TimeAgo date={person?.createdAt} />
                             </p>
                           </span>
                         </div>
 
-                        {/* btn-div */}
-                        <div>
-                          <button className="btn btn-white btn-sm rounded-pill border px-2">
-                            follow
+                        {data?._id !== userIdOfViewer && (
+                          <button
+                            type="button"
+                            className="btn btn-outline-primary btn-sm rounded-pill px-3 flex-shrink-0"
+                            onClick={() => handleUnfollow(data._id)}
+                          >
+                            Following
                           </button>
-                        </div>
+                        )}
                       </div>
 
-                      {/* post */}
                       <p>{person.text}</p>
 
-                      {/* post-img */}
-                      <LazyLoadImage
-                        height={"100%"}
-                        width={"100%"}
-                        effect="blur"
-                        src={person.imagePath}
-                      />
+                      {person.imagePath && (
+                        <LazyLoadImage
+                          effect="blur"
+                          wrapperClassName="post-image-frame"
+                          className="post-image"
+                          src={person.imagePath}
+                          alt={`Image shared by ${data?.userName}`}
+                        />
+                      )}
 
-                      {/* reactions */}
-                      <main className="d-flex pt-2 justify-content-between align-items-center">
-                        {/* like and comment */}
-
-                        <div className="d-flex gap-2 ">
-                          <div onClick={() => handleLike(_id)}>
-                            <img
-                              src={isLiked ? likeImg : unLikeImg}
-                              alt=""
-                              role="button"
-                            />
-                          </div>
-                          <div className="mt-2">{likeCount} like(s)</div>
-                          <div onClick={() => openCommentModal(_id)}>
-                            <img src={commentImg} alt="" role="button" />
-                          </div>
-                          <p className="mt-2">
-                            {person.commentsCount} comment(s)
-                          </p>
+                      <div className="d-flex pt-2 justify-content-between align-items-center">
+                        <div className="d-flex gap-2 align-items-center">
+                          <button
+                            type="button"
+                            className="btn-icon"
+                            aria-pressed={isLiked}
+                            aria-label={isLiked ? "Unlike this post" : "Like this post"}
+                            onClick={() => handleLike(_id)}
+                          >
+                            <img src={isLiked ? likeImg : unLikeImg} alt="" aria-hidden="true" />
+                          </button>
+                          <span>{likeCount} like(s)</span>
+                          <button
+                            type="button"
+                            className="btn-icon"
+                            aria-label="View comments"
+                            onClick={() => openCommentModal(_id)}
+                          >
+                            <img src={commentImg} alt="" aria-hidden="true" />
+                          </button>
+                          <span>{person.commentsCount} comment(s)</span>
                         </div>
 
-                        {/* share */}
-                        <div>
-                          <img src={shareImg} alt="" role="button" />
-                        </div>
-                      </main>
-                    </div>
+                        <button type="button" className="btn-icon" aria-label="Share this post">
+                          <img src={shareImg} alt="" aria-hidden="true" />
+                        </button>
+                      </div>
+                    </article>
                   );
                 })}
               </div>

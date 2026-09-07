@@ -1,12 +1,12 @@
-import React, { createContext, useState, useEffect } from "react";
+import { createContext, useState, useEffect, useCallback } from "react";
 import toast from "react-hot-toast";
-import profileImg from '../assets/profile-pic.svg'
+import profileImg from "../assets/profile-pic.svg";
 import { useNavigate } from "react-router-dom";
-
+import { get, patch } from "../api/client";
 
 const UserContext = createContext();
 
-export const  UserProvider = ({ children })=>{
+export const UserProvider = ({ children }) => {
   const [bioProfile, setBioProfile] = useState([]);
   const [bio, setBio] = useState("");
   const [age, setAge] = useState("");
@@ -15,69 +15,53 @@ export const  UserProvider = ({ children })=>{
   const [occupation, setOccupation] = useState("");
   const [x, setX] = useState("");
   const [linkedIn, setLinkedIn] = useState("");
-  const [isCLicked,setIsClicked] = useState(false);
+  const [isCLicked, setIsClicked] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
-  const [preview, setPreview] = useState(profileImg); 
+  const [preview, setPreview] = useState(profileImg);
   const [isLoading, setIsLoading] = useState(false);
-  const [timeLine,setTimeLine] = useState([])
-  
-  
-  
-  
+  const [timeLine, setTimeLine] = useState([]);
+
   const token = localStorage.getItem("clientToken");
-  const navigate = useNavigate()
-// bioProfile Ftn
-  const getBioProfile = async () => {
-      
-      try {
-        setIsLoading(true);
-        const request = await fetch("https://em-mern-social-app.onrender.com/api/v1/users", {
-            headers: {
-                "Content-type": "application/json",
-                Authorization: `Bearer ${token}`,
-            },
-        });
-        const response = await request.json();
-        // console.log(response.user);
-        setBioProfile(response?.user);
-        setBio(response?.user?.bio || "");
-        setLocation(response?.user?.location);
-        setOccupation(response?.user?.occupation);
-        setX(response?.user?.x);
-        setLinkedIn(response?.user?.linkedIn);
-        setAge(response?.user?.age || "") ;     
-        setGender(response?.user?.gender || "");
-        setPreview(response?.user?.profilePhoto || profileImg); 
+  const navigate = useNavigate();
+
+  const getBioProfile = useCallback(async () => {
+    if (!token) return;
+    try {
+      setIsLoading(true);
+      const response = await get("/users");
+      setBioProfile(response?.user);
+      setBio(response?.user?.bio || "");
+      setLocation(response?.user?.location);
+      setOccupation(response?.user?.occupation);
+      setX(response?.user?.x);
+      setLinkedIn(response?.user?.linkedIn);
+      setAge(response?.user?.age || "");
+      setGender(response?.user?.gender || "");
+      setPreview(response?.user?.profilePhoto || profileImg);
     } catch (error) {
-        console.log(error.message);
-    }finally{
-        setIsLoading(false);
-
+      console.error("Failed to load profile:", error.message);
+    } finally {
+      setIsLoading(false);
     }
-  };
+  }, [token]);
 
-  // file change ftn
   const handleFileChange = (event) => {
-    if (event.target.files && event.target.files[0]) {
-      if (event.target.files[0].size > 2 * 1000 * 1000) {
-        toast.error("File with maximum size of 2MB is allowed");
-        return false;
-      }
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 2 * 1000 * 1000) {
+      toast.error("File with maximum size of 2MB is allowed");
+      return;
     }
-    const file = event.target.files[0];
     setSelectedFile(file);
 
     const reader = new FileReader();
-    reader.onloadend = () => {
-      setPreview(reader.result);
-    };
-    if (file) {
-      reader.readAsDataURL(file);
-    }
+    reader.onloadend = () => setPreview(reader.result);
+    reader.readAsDataURL(file);
   };
-// handlesubmit ftn for update ftn
+
   const handleSubmit = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
     const formData = new FormData();
     formData.append("bio", bio);
     formData.append("age", age);
@@ -89,79 +73,50 @@ export const  UserProvider = ({ children })=>{
     if (selectedFile) {
       formData.append("profilePhoto", selectedFile);
     }
-    setIsClicked(true)
+    setIsClicked(true);
 
     try {
-      const response = await fetch("https://em-mern-social-app.onrender.com/api/v1/users/update-profile", {
-        method: "PATCH",
-        body: formData,
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const result = await response.json();
-      // console.log(result);
-      if(result){
-        setIsClicked(true)
-        toast.success(result.message)
-          // Fetch updated profile information
-      const profileRequest = await fetch(
-        "https://em-mern-social-app.onrender.com/api/v1/users",
-        {
-          headers: {
-            "Content-type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      const profileResponse = await profileRequest.json();
-      
-      // Update bioProfile state with updated profile information
-      setBioProfile(profileResponse.user);
+      const result = await patch("/users/update-profile", formData);
+      if (result) {
+        toast.success(result.message);
+        await getBioProfile();
       }
     } catch (error) {
-      console.error("Error updating profile:", error);
-
-    }finally{
-      setIsClicked(false)
+      console.error("Error updating profile:", error.message);
+      toast.error(error.message);
+    } finally {
+      setIsClicked(false);
     }
   };
 
-  // timeline
-  const getTimeLine = async () => {
-      
+  const getTimeLine = useCallback(async () => {
+    if (!token) return;
     try {
       setIsLoading(true);
-      const request = await fetch("https://em-mern-social-app.onrender.com/api/v1/posts/timeline", {
-          headers: {
-              "Content-type": "application/json",
-              Authorization: `Bearer ${token}`,
-          },
-      });
-      const response = await request.json();
-      // console.log(response.posts);
-      setTimeLine(response?.posts || []); 
-      
-  } catch (error) {
-      console.log(error.message);
-  }finally{
+      const response = await get("/posts/timeline");
+      setTimeLine(response?.posts || []);
+    } catch (error) {
+      console.error("Failed to load timeline:", error.message);
+    } finally {
       setIsLoading(false);
+    }
+  }, [token]);
 
-  }
-};
-//logout
-const logOut = ()=>{
-  localStorage.removeItem("clientToken")
-  navigate("/signin")
-}
+  const logOut = () => {
+    localStorage.removeItem("clientToken");
+    localStorage.removeItem("userId");
+    navigate("/signin");
+  };
 
   useEffect(() => {
-    getTimeLine()
+    getTimeLine();
     getBioProfile();
-  }, []);
+  }, [getTimeLine, getBioProfile]);
 
-    return < UserContext.Provider value={{
-      logOut,
+  return (
+    <UserContext.Provider
+      value={{
+        logOut,
         bio,
         getTimeLine,
         setTimeLine,
@@ -191,10 +146,12 @@ const logOut = ()=>{
         setPreview,
         isLoading,
         setIsLoading,
-        timeLine
-    }}>
-    {children}
+        timeLine,
+      }}
+    >
+      {children}
     </UserContext.Provider>
-}
+  );
+};
 
 export default UserContext;

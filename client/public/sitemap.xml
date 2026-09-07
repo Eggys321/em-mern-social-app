@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  This app is a private, sign-in-gated social feed — the "/" route itself
+  redirects anonymous visitors to /signin, so it is intentionally left out
+  of both this sitemap and robots.txt. Only the public entry points
+  (sign in / sign up / reset password) are listed.
+-->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://em-mern-social-app.vercel.app/signin</loc>
+    <changefreq>monthly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://em-mern-social-app.vercel.app/signup</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://em-mern-social-app.vercel.app/resetpassword</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.1</priority>
+  </url>
+</urlset>

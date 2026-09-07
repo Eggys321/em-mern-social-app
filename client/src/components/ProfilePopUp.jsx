@@ -1,72 +1,37 @@
-import { useState,useEffect, useContext } from 'react';
+import { useState, useContext } from 'react';
 import Offcanvas from 'react-bootstrap/Offcanvas';
-import profileImg from '../assets/profile-img.svg';
 import NavBag from './NavBag';
-import { useNavigate } from 'react-router-dom';
-import toast from 'react-hot-toast';
 import UserContext from '../context/UserContext';
 
-function ProfilePopUp({ name, ...props }) {
+function ProfilePopUp() {
   const [show, setShow] = useState(false);
-
-  const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
-  const {getBioProfile,setBioProfile,bioProfile} = useContext(UserContext)
-  // const [bioProfile,setBioProfile] = useState([]);
-
-  const token = localStorage.getItem("clientToken");
-  const navigate = useNavigate();
-  // const getBioProfile = async ()=>{
-  //   try {
-      
-  //     const request = await fetch("http://localhost:5782/api/v1/users",{
-  //       headers:{
-  //         "Content-type":"application/json",
-  //         Authorization:`Bearer ${token}`
-  //       }
-  //     })
-  //     const response = await request.json();
-  //     // console.log(response.user);
-  //     setBioProfile(response.user)
-  //   } catch (error) {
-  //     console.log(error.message);
-  //   }
-  // }
-
-  useEffect(()=>{
-    if(!token){
-      toast.error("unauthorized,sign in")
-        navigate('/signin');
-    }
-    // getBioProfile()
-},[])
+  const { bioProfile } = useContext(UserContext);
 
   return (
     <>
-    <img src={bioProfile?.profilePhoto} alt='' className='profile-img'  style={{borderRadius:"5rem", height:"3rem",width:"3rem"}} onClick={handleShow}/>
-      {/* <img src={profileImg} onClick={handleShow} alt='' /> */}
+      <button
+        type="button"
+        className="btn-icon border-0 bg-transparent p-0"
+        aria-label="Open profile menu"
+        onClick={() => setShow(true)}
+      >
+        <img
+          src={bioProfile?.profilePhoto}
+          alt={bioProfile?.userName ? `${bioProfile.userName}'s profile photo` : "Profile photo"}
+          className="avatar avatar-sm"
+        />
+      </button>
 
-      <Offcanvas show={show} onHide={handleClose} {...props}>
+      <Offcanvas show={show} onHide={() => setShow(false)} placement="bottom">
         <Offcanvas.Header closeButton>
+          <Offcanvas.Title>Profile</Offcanvas.Title>
         </Offcanvas.Header>
         <Offcanvas.Body>
-         <NavBag/>
+          <NavBag />
         </Offcanvas.Body>
       </Offcanvas>
     </>
   );
 }
 
-function Example() {
-  return (
-    <>
-      {['bottom'].map((placement, idx) => (
-        <ProfilePopUp key={idx} placement={placement} name={placement} />
-      ))}
-    </>
-  );
-}
-
-
-
-export default Example;
+export default ProfilePopUp;

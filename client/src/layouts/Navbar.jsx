@@ -1,204 +1,88 @@
-import { useEffect, useCallback, useState } from "react";
+import { useState } from "react";
 import homeImg from "../assets/home-img.svg";
 import communityImg from "../assets/community-img.svg";
-import profileImg from "../assets/profile-img.svg";
-import searchImg from "../assets/search-img.svg";
 import NavBag from "../components/NavBag";
+import ProfileSection from "../components/ProfileSection";
+import UserSearchBox from "../components/UserSearchBox";
 import logoImg from "../assets/logo.svg";
 import "../styles/Nav.css";
-import { GoChevronDown } from "react-icons/go";
-import { GoChevronUp } from "react-icons/go";
-import ProfileSection from "../components/ProfileSection";
-import EditProfileModal from "../components/EditProfileModal";
-import { Link } from "react-router-dom";
-import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
-import debounce from "lodash.debounce";
+import { GoChevronDown, GoChevronUp } from "react-icons/go";
+import { Link, NavLink } from "react-router-dom";
 import { useBioProfile } from "../hooks/useBioProfile";
+
 const Navbar = () => {
-  // const [modalShow, setModalShow] = useState(false);
-  const [bagShow, SetBagShow] = useState(false);
-  // const [bioProfile, setBioProfile] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [searchResults, setSearchResults] = useState([]);
-  
-  
-  
-  
+  const [bagShow, setBagShow] = useState(false);
+
   const token = localStorage.getItem("clientToken");
-  const { data, error, isLoading } = useBioProfile(token);
+  const { data } = useBioProfile(token);
   const bioProfile = data?.user;
-  const navigate = useNavigate();
-  // const getBioProfile = async () => {
-  //   try {
-  //     const request = await fetch("https://em-mern-social-app.onrender.com/api/v1/users", {
-  //       headers: {
-  //         "Content-type": "application/json",
-  //         Authorization: `Bearer ${token}`,
-  //       },
-  //     });
-  //     const response = await request.json();
-  //     // console.log(response.user);
-  //     setBioProfile(response.user);
-  //   } catch (error) {
-  //     console.log(error.message);
-  //   }
-  // };
-  function handleDrop() {
-    !bagShow ? SetBagShow(true) : SetBagShow(false);
-  }
 
-  const performSearch = useCallback(
-    async (term) => {
-      if (term) {
-        try {
-          const request = await fetch(
-            `https://em-mern-social-app.onrender.com/api/v1/users/search?searchTerm=${term}`,
-            {
-              headers: {
-                "Content-type": "application/json",
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
-          const response = await request.json();
-          if (response.success) {
-            setSearchResults(response.users);
-          } else {
-            setSearchResults([]);
-          }
-        } catch (error) {
-          console.log(error.message);
-          setSearchResults([]);
-        }
-      } else {
-        setSearchResults([]);
-      }
-    },
-    [token]
-  );
-  const debouncedSearch = useCallback(
-    debounce((term) => {
-      performSearch(term);
-    }, 3000),
-    [performSearch]
-  );
-  const handleSearch = (e) => {
-    const term = e.target.value;
-    setSearchTerm(term);
-    debouncedSearch(term);
-  };
-
-  useEffect(() => {
-    if (!token) {
-      toast.error("unauthorized,sign in");
-      navigate("/signin");
-    }
-    // getBioProfile();
-  }, []);
   return (
-    <>
+    <header>
       <main className="d-flex justify-content-between align-items-center container nav-container">
-        {/* search section */}
         <section className="d-flex gap-3 align-items-center search-div">
           <div className="logo-div d-none d-lg-block">
             <Link to="/">
-              <img src={logoImg} alt="" />
+              <img src={logoImg} alt="EM home" />
             </Link>
           </div>
-          <nav className="d-none d-lg-block">
 
-    </nav>
+          <nav aria-label="Primary" className="d-none d-lg-block" />
+
           <ProfileSection />
 
-          <div className="position-relative">
-            <input
-              type="text"
-              className="rounded-pill ps-5 search-box"
-              placeholder="search a user"
-              value={searchTerm}
-              onChange={handleSearch}
-              style={{width:"100%"}}
-            />
-            <img
-            loading="lazy"
-              src={searchImg}
-              alt=""
-              className="position-absolute img-fluid search-img"
-
-            />
-            <div>
-              {searchTerm && (
-                <div className="search-results position-absolute z-1 bg-secondary text-white border rounded w-100">
-                  {searchResults.length ? (
-                    searchResults.map((user) => (
-                      <div key={user._id} className="search-result-item">
-                        <Link
-                          className="text-decoration-none text-white"
-                          to={`/singleuserprofile/${user._id}`}
-                        >
-                          {user.userName}
-                        </Link>
-                      </div>
-                    ))
-                  ) : (
-                    <div className="search-no-results">No results found</div>
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
+          <UserSearchBox />
         </section>
-
-        {/* profile section */}
 
         <div className="d-none d-md-block">
           <section className="d-flex gap-3 align-items-center position-relative">
+            <NavLink
+              to="/"
+              end
+              className={({ isActive }) =>
+                `nav-link-item d-flex flex-column align-items-center text-decoration-none px-3 py-1 rounded-3${
+                  isActive ? " nav-link-item--active" : ""
+                }`
+              }
+            >
+              <img src={homeImg} alt="" aria-hidden="true" />
+              <span>Home</span>
+            </NavLink>
+            <NavLink
+              to="/community"
+              className={({ isActive }) =>
+                `nav-link-item d-flex flex-column align-items-center text-decoration-none px-3 py-1 rounded-3${
+                  isActive ? " nav-link-item--active" : ""
+                }`
+              }
+            >
+              <img src={communityImg} alt="" aria-hidden="true" />
+              <span>Community</span>
+            </NavLink>
             <div className="d-flex flex-column align-items-center">
-              <Link to="/" className="text-decoration-none">
-                <div>
-                  <img src={homeImg} alt="" />
-                </div>
-                <span> Home</span>
-              </Link>
-            </div>
-            <div className="">
-              <Link className="text-decoration-none" to="/community">
-                <div>
-                  <div className="text-center">
-                    <img src={communityImg} alt="" />
-                  </div>
-
-                  <span>Community</span>
-                </div>
-              </Link>
-            </div>
-            <div className="d-flex flex-column align-items-center ">
               <img
                 src={bioProfile?.profilePhoto}
-                alt=""
-                className="profile-img p-1 "
-                style={{ borderRadius: "100%", height: "3rem", width: "4rem" }}
-              />{" "}
-              <span className="d-flex">
+                alt={bioProfile?.userName ? `${bioProfile.userName}'s profile photo` : "Your profile photo"}
+                className="avatar avatar-sm p-1"
+              />
+              <span className="d-flex align-items-center gap-1">
                 Me
-                <span
-                  className="d-none d-md-block"
-                  role="button"
-                  onClick={handleDrop}
+                <button
+                  type="button"
+                  className="btn-icon d-none d-md-inline-flex"
+                  aria-expanded={bagShow}
+                  aria-label={bagShow ? "Hide profile menu" : "Show profile menu"}
+                  onClick={() => setBagShow((prev) => !prev)}
                 >
-                  {" "}
                   {bagShow ? <GoChevronUp /> : <GoChevronDown />}
-                </span>
+                </button>
               </span>
             </div>
-            <div className="position-absolute nav-bag bg-light">
-              {bagShow && <NavBag />}
-            </div>
+            <div className="position-absolute nav-bag bg-light">{bagShow && <NavBag />}</div>
           </section>
         </div>
       </main>
-    </>
+    </header>
   );
 };
 

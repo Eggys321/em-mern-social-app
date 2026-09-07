@@ -1,6 +1,5 @@
 import * as yup from "yup";
 
-// for signup
 export const regFormSchema = yup
   .object({
     email: yup
@@ -21,7 +20,6 @@ export const regFormSchema = yup
   })
   .required();
 
-// for resetpasswordlink
 export const resetPwdLinkSchema = yup
   .object({
     password: yup
@@ -36,7 +34,6 @@ export const resetPwdLinkSchema = yup
       .oneOf([yup.ref("password")], "Password do not match"),
   })
   .required();
-// for sign in
 export const signInSchema = yup
   .object({
     email: yup
@@ -50,7 +47,6 @@ export const signInSchema = yup
   })
   .required();
 
-// for forgot password
 export const forgotPasswordSchema = yup
   .object({
     email: yup
@@ -60,14 +56,12 @@ export const forgotPasswordSchema = yup
   })
   .required();
 
-// post text only
 export const postText = yup
   .object({
     text: yup.string().required("text is required"),
   })
   .required();
 
-// text or image
 export const postTextImg = yup.object().shape({
   text: yup.string().nullable(),
   imagePath: yup

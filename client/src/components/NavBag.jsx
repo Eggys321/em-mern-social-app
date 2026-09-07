@@ -2,58 +2,52 @@ import { useContext, useState } from "react";
 import editImg from "../assets/edit-img.svg";
 import notImg from "../assets/notification-img.svg";
 import logOutImg from "../assets/logout-img.svg";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import EditProfileModal from "./EditProfileModal";
 import UserContext from "../context/UserContext";
-import "../styles/NavBag.css"
+import "../styles/NavBag.css";
+
 const NavBag = () => {
   const [modalShow, setModalShow] = useState(false);
-  const {logOut} = useContext(UserContext)
-  
+  const { logOut } = useContext(UserContext);
 
   return (
     <>
       <EditProfileModal show={modalShow} onHide={() => setModalShow(false)} />
 
-      <section className="navbag-container rounded-2 border p-2 shadow-lg position-relative z-3 ">
-        {/* Edit */}
+      <section className="navbag-container rounded-2 border p-2 shadow-lg position-relative z-3">
         <div className="mb-4">
-          <div
-            className="d-flex gap-2 align-items-center first-div justify-content-start"
-            role="button"
+          <button
+            type="button"
+            className="d-flex gap-2 align-items-center first-div justify-content-start btn p-0 border-0 bg-transparent w-100 text-start"
+            onClick={() => setModalShow(true)}
           >
-            <img src={editImg} alt="" />
-
-            <span
-              className=""
-              show={modalShow}
-              onClick={() => setModalShow(true)}
-            >
-              Edit Profile
-            </span>
-          </div>
+            <img src={editImg} alt="" aria-hidden="true" />
+            <span>Edit Profile</span>
+          </button>
           <hr />
         </div>
 
-        {/* Notification */}
         <div className="mb-4">
-          <div className="d-flex gap-2 align-items-center first-div justify-content-start">
-            <Link to="#">
-              <img src={notImg} alt="" />
-            </Link>
-            <span className="">Notifications</span>
-          </div>
+          <Link
+            to="/notifications"
+            className="d-flex gap-2 align-items-center first-div justify-content-start text-decoration-none text-dark"
+          >
+            <img src={notImg} alt="" aria-hidden="true" />
+            <span>Notifications</span>
+          </Link>
           <hr />
         </div>
 
-        {/* Logout */}
         <div>
-          <div className="d-flex gap-2 align-items-center first-div justify-content-start ">
-            <Link to="#">
-              <img src={logOutImg} alt="" />
-            </Link>
-            <span role="button" className="" onClick={logOut}>Log Out</span>
-          </div>
+          <button
+            type="button"
+            className="d-flex gap-2 align-items-center first-div justify-content-start btn p-0 border-0 bg-transparent w-100 text-start"
+            onClick={logOut}
+          >
+            <img src={logOutImg} alt="" aria-hidden="true" />
+            <span>Log Out</span>
+          </button>
           <hr />
         </div>
       </section>

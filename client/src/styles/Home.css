@@ -1,36 +1,28 @@
-.home-wrapper {
-  background: #e7edef;
+.top-news-field {
+  background-color: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+  border-color: transparent !important;
 }
 
-.profile-section{
-  background-color: #FFFFFF;
-  position: sticky;
-  top: 0;
+.post-input {
+  height: 2.25rem;
+  border: 1.5px solid var(--color-border);
+  background: var(--color-bg);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
 
-.top-news-field, .scroll-page{
-  background-color: #FFFFFF;
+.post-input:focus-visible {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-soft);
 }
 
-.post-input{
-  height: 2rem;
-}
-.home-post-error-state{
+.home-post-error-state {
   min-width: 50%;
 }
 
-
-
-@media(max-width:431px){
-  .home-post-error-state{
+@media (max-width: 431px) {
+  .home-post-error-state {
     min-width: 70%;
   }
 }
-
-/* .home-main{
-  
-} */
-
-/* .profile-img{
-  width: 3rem;
-} */

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 
@@ -12,23 +12,19 @@ const TimeAgo = ({ date }) => {
       return;
     }
 
-    // Calculate the relative time difference
     const calculateTimeAgo = () => {
       const relativeTimeDifference = dayjs(date).fromNow();
       setTimeAgo(relativeTimeDifference);
     };
 
-    // Initial calculation
     calculateTimeAgo();
 
-    // Update timeAgo every minute
     const interval = setInterval(calculateTimeAgo, 60000);
 
-    // Cleanup function to clear interval
     return () => clearInterval(interval);
   }, [date]);
 
-  return <span>{timeAgo}</span>;
+  return <time dateTime={date}>{timeAgo}</time>;
 };
 
 export default TimeAgo;

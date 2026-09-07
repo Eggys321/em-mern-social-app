@@ -1,8 +1,6 @@
-import React from "react";
 import BeatLoader from "react-spinners/BeatLoader";
 import CircleLoader from "react-spinners/CircleLoader";
-import Spinner from 'react-bootstrap/Spinner';
-
+import ClipLoader from "react-spinners/ClipLoader";
 
 export const Loader = () => {
   return (
@@ -21,9 +19,7 @@ export const Cliploader = () => {
 export const SpinnerLoader = () => {
   return (
     <div>
-      <Spinner animation="grow" margin={4} />
+      <ClipLoader color={"#1565D8"} size={35} />
     </div>
   );
 };
-
-// export default Loader;

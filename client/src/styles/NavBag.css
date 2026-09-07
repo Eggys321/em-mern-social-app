@@ -1,4 +1,7 @@
-.navbag-container{
-    background-color: rgb(255, 255, 255);
-  }
-  
+.navbag-container {
+  background-color: var(--color-surface);
+}
+
+.first-div {
+  margin-bottom: -0.5rem;
+}

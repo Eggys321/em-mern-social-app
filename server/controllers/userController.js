@@ -3,7 +3,6 @@ const USER = require("../model/userModel");
 const cloudinary = require("cloudinary").v2;
 const fs = require("fs");
 
-// own account
 const getBioProfile = async (req, res) => {
   const { userId } = req.user;
   try {
@@ -21,17 +20,15 @@ const getBioProfile = async (req, res) => {
     });
   } catch (error) {
     console.log(error.message);
-    res.status(500).json(error.message);
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
-// follow a user
 const followUser = async (req, res) => {
   try {
     const { followersId } = req.params;
     const { userId } = req.user;
 
-    //finding userId and followersId from our DB
     const user = await USER.findById(userId);
     const follower = await USER.findById(followersId);
     if (!user || !follower) {
@@ -65,16 +62,14 @@ const followUser = async (req, res) => {
         });
     }
   } catch (error) {
-    res.status(500).json(error.message);
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
-// unfollow user
 const unfollowUser = async (req, res) => {
   try {
     const { followersId } = req.params;
     const { userId } = req.user;
-    //finding userId and followersId from our DB
     const user = await USER.findById(userId);
     const follower = await USER.findById(followersId);
     if (!user || !follower) {
@@ -102,11 +97,10 @@ const unfollowUser = async (req, res) => {
         .json({ success: false, message: "you are not following this user" });
     }
   } catch (error) {
-    res.status(500).json(error.message);
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
-// getUsersProfile
 const getSingleUser = async (req, res) => {
   const { userId } = req.params;
   try {
@@ -116,16 +110,14 @@ const getSingleUser = async (req, res) => {
       res.status(404).json({ success: false, message: "user not found" });
       return;
     }
-    // fetching user posts
     const posts = await POST.find({user:userId}).sort({createdAt:-1});
 
     res.status(200).json({ success: true, message: "user profile", user,posts });
   } catch (error) {
-    res.status(500).json(error.message);
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
-// get all users
 const getAllUsers = async (req, res) => {
   try {
     const users = await USER.find().select("-password");
@@ -135,23 +127,18 @@ const getAllUsers = async (req, res) => {
     }
     res.status(200).json({ success: true, message: "all users", users });
   } catch (error) {
-    res.status(500).json(error.message);
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
-// search all users
 const searchUsers = async (req, res) => {
   try {
     const { searchTerm } = req.query;
     console.log(searchTerm);
     let queryObject = {};
 
-    // search by studentId, name, courseCohort, pka
     if (searchTerm) {
       const regex = { $regex: searchTerm, $options: "i" };
-      // queryObject.$or = [
-      //   { userName: regex }
-      // ];
       queryObject = { userName: regex };
     }
     console.log(queryObject);
@@ -162,55 +149,39 @@ const searchUsers = async (req, res) => {
     }
     res.status(200).json({ success: true, users });
 
-    // const { query } = req.query;
-    // const searchCriteria = {
-    //   $or: [
-    //     { userName: { $regex: query, $options: 'i' } }]
-    // };
-    // const users = await USER.find(searchCriteria).select('-password');
-    // if (users.length === 0) {
-    //   return res.status(404).json({ success: 'false', message: 'No users found' });
-    // }
-    // res.status(200).json({
-    //   success: 'true',
-    //   users
-    // });
   } catch (error) {
-    res.status(500).json(error.message);
+    res.status(500).json({ success: false, message: error.message });
   }
 };
-// update user profile ftn
 const updateUserProfile = async (req, res) => {
   const { userId } = req.user;
   const { bio, age, gender, location, occupation, x, linkedIn } = req.body;
   let profilePicture;
 
   try {
-    // console.log("Request files:", req.files); // Log the files from the request
-    // console.log("Request body:", req.body); // Log the body from the request
+    if (req.files && req.files.profilePhoto) {
 
-    // Check if a profile picture is uploaded
-    if (req.files && req.files.profilePhoto) {  
+      const profilePhotoFile = req.files.profilePhoto;
 
-      // Upload image to Cloudinary with the specified folder
-      const result = await cloudinary.uploader.upload(req.files.profilePhoto.tempFilePath, {
+      if (!profilePhotoFile.mimetype || !profilePhotoFile.mimetype.startsWith("image/")) {
+        return res.status(400).json({ success: false, message: "Uploaded file must be an image" });
+      }
+
+      const result = await cloudinary.uploader.upload(profilePhotoFile.tempFilePath, {
         folder: 'EM_profilePhoto',
       });
 
-      // Ensure that the upload was successful
       if (result && result.secure_url) {
         profilePicture = result.secure_url;
         console.log("Profile picture URL:", profilePicture);
 
-        // Remove the uploaded file from the server
-        fs.unlinkSync(req.files.profilePhoto.tempFilePath);
+        fs.unlinkSync(profilePhotoFile.tempFilePath);
       } else {
         console.error('Cloudinary upload failed');
         return res.status(500).json({ success: false, message: 'Failed to upload image' });
       }
     }
 
-    // Prepare updated user data
     const updatedUserData = {
       bio,
       age,
@@ -225,7 +196,6 @@ const updateUserProfile = async (req, res) => {
       updatedUserData.profilePhoto = profilePicture;
     }
 
-    // Find the user and update the profile
     const updatedUser = await USER.findByIdAndUpdate(
       userId,
       { $set: updatedUserData },
@@ -243,7 +213,7 @@ const updateUserProfile = async (req, res) => {
     });
   } catch (error) {
     console.error('Error updating profile:', error);
-    res.status(500).json({ success: false, message: 'Internal server error', error: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 module.exports = {

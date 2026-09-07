@@ -1,39 +1,46 @@
-import './App.css';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import SignIn from './auth/SignIn';
-import SignUp from './auth/SignUp';
-import ResetPassword from './auth/ResetPassword';
-import Home from './pages/Home.jsx';
-import { Toaster } from 'react-hot-toast';
-import Community from './pages/Community.jsx';
-import SingleUserProfile from './pages/SingleUserProfile.jsx';
-import ResetPasswordLink from './auth/ResetPasswordLink.jsx';
+import { lazy, Suspense } from "react";
+import { Routes, Route } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
+import ErrorBoundary from "./components/ErrorBoundary";
+import ProtectedRoute from "./components/ProtectedRoute";
+import PageLoader from "./utils/PageLoader";
+
+const SignIn = lazy(() => import("./auth/SignIn"));
+const SignUp = lazy(() => import("./auth/SignUp"));
+const ResetPassword = lazy(() => import("./auth/ResetPassword"));
+const ResetPasswordLink = lazy(() => import("./auth/ResetPasswordLink"));
+const Home = lazy(() => import("./pages/Home.jsx"));
+const Community = lazy(() => import("./pages/Community.jsx"));
+const SingleUserProfile = lazy(() => import("./pages/SingleUserProfile.jsx"));
+const Notifications = lazy(() => import("./pages/Notifications.jsx"));
+const NotFound = lazy(() => import("./pages/NotFound.jsx"));
 
 function App() {
   return (
-    <>
-      
+    <ErrorBoundary>
+      <a href="#main-content" className="skip-link">
+        Skip to main content
+      </a>
+      <Suspense fallback={<PageLoader />}>
         <Routes>
-          <Route path='/' element={<Home />}/>
-          <Route path='/signin' element={<SignIn />}/>
-          <Route path='/signup' element={<SignUp />}/>
-          <Route path='/community' element={<Community/>}/>
-          <Route path='/resetpassword' element={<ResetPassword />}/>
-          <Route path='/singleuserprofile/:userId'  element={<SingleUserProfile/>} />
-          <Route path='/resetpasswordlink/:resetToken' element={<ResetPasswordLink/>} />
-        </Routes>
-      
-      <Toaster/>
+          <Route path="/signin" element={<SignIn />} />
+          <Route path="/signup" element={<SignUp />} />
+          <Route path="/resetpassword" element={<ResetPassword />} />
+          <Route path="/resetpasswordlink/:resetToken" element={<ResetPasswordLink />} />
 
-    </>
+          <Route element={<ProtectedRoute />}>
+            <Route path="/" element={<Home />} />
+            <Route path="/community" element={<Community />} />
+            <Route path="/singleuserprofile/:userId" element={<SingleUserProfile />} />
+            <Route path="/notifications" element={<Notifications />} />
+          </Route>
+
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </Suspense>
+      <Toaster />
+    </ErrorBoundary>
   );
 }
 
 export default App;
-
-{
-  /* <Route element={<NavBar cartItem = {cartItem}/>}>
-<Route path='/' element={<Home />} />
-<Route path='/CheckOut' element={<CheckOut />} />
-</Route> */
-}

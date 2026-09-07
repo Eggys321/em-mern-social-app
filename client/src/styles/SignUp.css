@@ -1,37 +1,43 @@
-/* .img-section {
-  background: #e7edef;
+.img-section {
+  background: var(--color-bg);
 }
 
 .wrapper {
   overflow-x: hidden;
+  min-height: 100dvh;
+  background: var(--color-bg);
 }
 
 .form-section {
-  background-color: #ffffff;
+  background-color: var(--color-bg);
 }
 
-.con-pass-input-img{
-top: 12.4rem;
-width: 2rem;
-height: 2rem;
-left: 0.7rem;
+.form-div {
+  width: fit-content;
+  max-width: 100%;
+  margin: 0 auto;
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  padding: 2.5rem 2rem;
 }
 
-.user-input-img{
-width: 2rem;
-height: 2rem;
-left: 0.7rem;
-top: 4.3rem;
-}
 input {
   outline: 0;
-  border: 1.5px solid rgba(131, 151, 155, 1);
-  background: #e7edef;
+  border: 1.5px solid var(--color-border);
+  background: var(--color-bg);
   height: 3rem;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+input:focus-visible {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-soft);
 }
 
 form {
-  width: 30rem;
+  width: min(30rem, 90vw);
   margin: auto;
 }
 
@@ -42,29 +48,12 @@ form {
   left: 0.7rem;
 }
 
-.pass-input-img {
-  height: 2rem;
-  width: 2rem;
-  top: 8.4rem;
-  left: 0.7rem;
-}
-
-.sign-up-eye-img-2{
-  top: 12.5rem;
-}
-
-.sign-up-eye-img{
-  top: 8.5rem;
-} */
-
 @media (max-width: 425px) {
-  form {
-    width: 90%;
-    margin: auto;
-    max-height: 100vh;
-  }
-
   .header-div {
     margin-top: 5rem;
+  }
+
+  .form-div {
+    padding: 2rem 1.25rem;
   }
 }

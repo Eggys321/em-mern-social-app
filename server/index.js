@@ -8,29 +8,28 @@ const userRoute = require("./routes/userRoute");
 const postRoute = require("./routes/postRoute")
 const cors = require("cors");
 const morgan = require("morgan");
+const helmet = require("helmet");
+const rateLimit = require("express-rate-limit");
 const cloudinary = require("cloudinary").v2;
 const fileUpload = require("express-fileupload");
 
 
 
-// custom middlewares
+app.use(helmet());
 app.use(fileUpload({ useTempFiles: true }));
 app.use(express.json());
 app.use(cors());
 app.use(morgan('common'));
 
-// app.use(
-//     fileUpload({
-//       useTempFiles: true,
-//       tempFileDir: "/tmp/",
-//     })
-//   );
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, message: "Too many requests, please try again later." },
+});
 
-
-
-// API's
-
-app.use('/api/v1/auth',authRoute);
+app.use('/api/v1/auth',authLimiter,authRoute);
 app.use('/api/v1/users',userRoute);
 app.use('/api/v1/posts',postRoute)
 
@@ -40,7 +39,15 @@ cloudinary.config({
     api_secret: process.env.api_secret,
   });
 
-// server and DB connection
+const requiredEnvVars = ["MONGODB_URL", "JWT_SECRET"];
+const missingEnvVars = requiredEnvVars.filter((name) => !process.env[name]);
+if (missingEnvVars.length > 0) {
+  console.error(
+    `Missing required environment variable(s): ${missingEnvVars.join(", ")}. Server cannot start.`
+  );
+  process.exit(1);
+}
+
 connect()
 .then(()=>{
     try {
@@ -58,7 +65,6 @@ connect()
 
 
 
-// routes
 app.get('/',(req,res)=>{
     res.status(200).json({success:true,message:"Em server is live"})
 })

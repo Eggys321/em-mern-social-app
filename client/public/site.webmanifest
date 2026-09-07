@@ -1,0 +1,16 @@
+{
+  "name": "EM",
+  "short_name": "EM",
+  "description": "Connect and share with your community.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#e7edef",
+  "theme_color": "#1565D8",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

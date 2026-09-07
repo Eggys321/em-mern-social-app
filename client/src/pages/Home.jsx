@@ -1,16 +1,13 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import NavSection from "../components/NavSection";
 import Navbar from "../layouts/Navbar";
-import profileImg from "../assets/profile-img.svg";
 import "../styles/Home.css";
 import Post from "../components/Post";
-import { people } from "../db";
 import commentImg from "../assets/comment-image.svg";
 import unLikeImg from "../assets/like-img.svg";
-import likeImg from "../assets/heart.jpg";
+import likeImg from "../assets/heart-filled.svg";
 import shareImg from "../assets/share-img.svg";
 import CommentModal from "../components/ComentModal";
-import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import Bio from "../components/Bio";
 import { postText } from "../utils/ValidationSchema";
@@ -19,152 +16,86 @@ import { useForm } from "react-hook-form";
 import UserContext from "../context/UserContext";
 import TimeAgo from "../components/TimeAgo";
 import { LazyLoadImage } from "react-lazy-load-image-component";
+import EditPostForm from "../components/EditPostForm";
+import Seo from "../components/Seo";
+import EmptyState from "../components/EmptyState";
 import { SpinnerLoader } from "../utils/Loader";
+import { post as apiPost, patch, del } from "../api/client";
 
 const Home = () => {
   const [modalShow, setModalShow] = useState(false);
-  const [likedPosts, setLikedPosts] = useState({});
-  const [likeCounts, setLikeCounts] = useState({});
   const [currentPostId, setCurrentPostId] = useState(null);
-  const [isTrue, setIsTrue] = useState(!false);
   const [showOptionsPostId, setShowOptionsPostId] = useState(null);
-
-  // const [currentUser, setCurrentUser] = useState(null);
+  const [editingPostId, setEditingPostId] = useState(null);
+  const [isSavingEdit, setIsSavingEdit] = useState(false);
 
   const userId = localStorage.getItem("userId");
 
-  // const [bioProfile, setBioProfile] = useState([]);
-  // console.log(people);
-  const { getBioProfile, bioProfile, timeLine, getTimeLine, setTimeLine } =
-    useContext(UserContext);
-  const navigate = useNavigate();
-  const token = localStorage.getItem("clientToken");
-  // console.log(timeLine);
+  const { bioProfile, timeLine, getTimeLine, setTimeLine, isLoading } = useContext(UserContext);
 
-  // const handleLike = async (postId) => {
-  //   try {
-  //     const response = await fetch(
-  //       `http://localhost:5782/api/v1/posts/like-post/${postId}`,
-  //       {
-  //         method: "POST",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //           Authorization: `Bearer ${token}`,
-  //         },
-  //       }
-  //     );
-  //     const data = await response.json();
-  //     if (response.ok) {
-  //       const updatedLikedPosts = { ...likedPosts };
-  //       if (updatedLikedPosts[postId] === userId) {
-  //         delete updatedLikedPosts[postId];
-  //       } else {
-  //         updatedLikedPosts[postId] = userId;
-  //       }
-  //       setLikedPosts(updatedLikedPosts);
-  //       localStorage.setItem("likedPosts", JSON.stringify(updatedLikedPosts));
-  //       getTimeLine();
-  //       toast.success(data.message);
-  //     } else {
-  //       toast.error(data.message);
-  //     }
-  //   } catch (error) {
-  //     console.error("Error liking/unliking post:", error);
-  //     toast.error("Failed to like/unlike post. Please try again.");
-  //   }
-  // };
-
-  // second
   const handleLike = async (postId) => {
     try {
-      const response = await fetch(
-        `https://em-mern-social-app.onrender.com/api/v1/posts/like-post/${postId}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
+      const data = await apiPost(`/posts/like-post/${postId}`);
+      setTimeLine((prev) =>
+        prev.map((p) => {
+          if (p._id !== postId) return p;
+          const alreadyLiked = p.likes?.includes(userId);
+          const likes = alreadyLiked
+            ? p.likes.filter((id) => id !== userId)
+            : [...(p.likes || []), userId];
+          return { ...p, likes };
+        })
       );
-      const data = await response.json();
-      if (response.ok) {
-        const updatedLikedPosts = { ...likedPosts };
-        // Initialize an empty array for the post if it doesn't exist in likedPosts
-        updatedLikedPosts[postId] = updatedLikedPosts[postId] || [];
-        // Add or remove the user's ID from the likedPosts array for the post
-        if (updatedLikedPosts[postId].includes(userId)) {
-          updatedLikedPosts[postId] = updatedLikedPosts[postId].filter(
-            (id) => id !== userId
-          );
-        } else {
-          updatedLikedPosts[postId].push(userId);
-        }
-        setLikedPosts(updatedLikedPosts);
-        localStorage.setItem("likedPosts", JSON.stringify(updatedLikedPosts));
-        toast.success(data.message);
-      } else {
-        toast.error(data.message);
-      }
+      toast.success(data.message);
     } catch (error) {
-      console.error("Error liking/unliking post:", error);
+      console.error("Error liking/unliking post:", error.message);
       toast.error("Failed to like/unlike post. Please try again.");
     }
   };
 
   function toggleShow(postId) {
-    setShowOptionsPostId((prevPostId) =>
-      prevPostId === postId ? null : postId
-    );
-    // isTrue ?  setIsTrue(false) : setIsTrue(true)
+    setShowOptionsPostId((prevPostId) => (prevPostId === postId ? null : postId));
   }
+
+  useEffect(() => {
+    if (!showOptionsPostId) return undefined;
+    const handleClickOutside = (event) => {
+      if (!event.target.closest("[data-post-options]")) {
+        setShowOptionsPostId(null);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [showOptionsPostId]);
 
   async function handleDeletePost(postIdx) {
     try {
-      const req = await fetch(
-        `https://em-mern-social-app.onrender.com/api/v1/posts/delete-post/${postIdx}`,
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      const res = await req.json();
-      if(res){
-        toast.success(res.message)
-      }
-      console.log(res);
+      const res = await del(`/posts/delete-post/${postIdx}`);
+      if (res) toast.success(res.message);
       setTimeLine(timeLine.filter((existingDatum) => existingDatum._id !== postIdx));
-
     } catch (error) {
-      console.log(error);
+      console.error("Error deleting post:", error.message);
+      toast.error(error.message);
+    } finally {
+      setShowOptionsPostId(null);
     }
   }
-  // timeline
 
-  // const getBioProfile = async () => {
-  //   try {
-  //     const request = await fetch(
-  //       "http://localhost:5782/api/v1/users",
-  //       {
-  //         headers: {
-  //           "Content-type": "application/json",
-  //           Authorization: `Bearer ${token}`,
-  //         },
-  //       }
-  //     );
-  //     const response = await request.json();
-  //     // console.log(response.user);
-  //     setBioProfile(response.user);
-  //   } catch (error) {
-  //     console.log(error.message);
-  //   }
-  // };
+  async function handleSaveEdit(postId, { text }) {
+    setIsSavingEdit(true);
+    try {
+      const res = await patch(`/posts/edit-post/${postId}`, { text });
+      toast.success(res.message);
+      setTimeLine((prev) => prev.map((p) => (p._id === postId ? { ...p, text } : p)));
+      setEditingPostId(null);
+    } catch (error) {
+      console.error("Error editing post:", error.message);
+      toast.error(error.message);
+    } finally {
+      setIsSavingEdit(false);
+    }
+  }
 
-  // for the post
   const {
     register,
     handleSubmit,
@@ -172,65 +103,35 @@ const Home = () => {
     formState: { errors, isSubmitting },
   } = useForm({
     resolver: yupResolver(postText),
-    defaultValues: {
-      text: "",
-    },
+    defaultValues: { text: "" },
   });
-  // console.log("errors", errors);
-  const handleUnfollow = async (userId) => {
-    // if (!currentUser) return;
 
+  const handleUnfollow = async (userIdToUnfollow) => {
     try {
-      const response = await fetch(
-        `https://em-mern-social-app.onrender.com/api/v1/users/unfollow/${userId}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          // body: JSON.stringify({ userId: currentUser._id }),
-        }
-      );
-      const result = await response.json();
-      console.log(result);
+      const result = await apiPost(`/users/unfollow/${userIdToUnfollow}`);
       if (result.success) {
         getTimeLine();
-
         toast.success(result.message);
       } else {
         toast.error(result.message);
       }
     } catch (error) {
-      console.error("Failed to unfollow user:", error);
+      console.error("Failed to unfollow user:", error.message);
+      toast.error(error.message);
     }
   };
+
   const handlePost = async (data) => {
     try {
-      const request = await fetch(
-        "https://em-mern-social-app.onrender.com/api/v1/posts/create-post",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(data),
-        }
-      );
-      // getTimeLine()
-      const response = await request.json();
-      console.log(response);
+      const response = await apiPost("/posts/create-post", data);
       if (response.success) {
         reset();
         toast.success(response.message);
         getTimeLine();
-
-        // setTimeLine(prevTimeLine => [response.post, ...prevTimeLine]);
       }
     } catch (error) {
-      console.log(error);
-    } finally {
+      console.error("Error creating post:", error.message);
+      toast.error(error.message);
     }
   };
 
@@ -242,75 +143,43 @@ const Home = () => {
   const handleCommentAdded = () => {
     getTimeLine();
   };
-  useEffect(() => {
-    if (!token) {
-      toast.error("unauthorized,sign in");
-      navigate("/signin");
-    }
-    const storedLikedPosts = JSON.parse(localStorage.getItem("likedPosts"));
-    if (storedLikedPosts) {
-      setLikedPosts(storedLikedPosts);
-    }
-
-    const counts = {};
-    timeLine.forEach((post) => {
-      counts[post._id] = post.likes.length;
-    });
-    setLikeCounts(counts);
-    getTimeLine();
-    // getBioProfile();
-    document.title = "Home | page";
-  }, []);
 
   return (
     <>
-      {/* nav */}
+      <Seo title="Home" description="Your timeline — posts from you and the people you follow." noIndex />
       <Navbar />
 
-      {/* main content */}
       <div className="home-wrapper">
         <div className="container">
-          <main className=" row home-main gap-2 pt-3">
-            <section
-              style={{ height: "45rem" }}
-              className=" col-md-4 d-none d-md-block p-2 rounded-2 border profile-section "
-            >
+          <main id="main-content" className="row home-main gap-2 pt-3">
+            <section className="col-md-4 d-none d-md-block p-2 rounded-2 border profile-section">
               <Bio />
             </section>
 
-            {/* news-field col */}
-
             <section className="col-md">
-              {/* top div */}
               <div className="p-2 top-news-field rounded-2 mb-2 border position-relative z-2">
-                {/*  */}
-                <form onSubmit={handleSubmit(handlePost)} className="w-100 ">
+                <form onSubmit={handleSubmit(handlePost)} className="w-100">
                   <div className="d-flex gap-2 align-items-center">
                     <img
                       src={bioProfile?.profilePhoto}
-                      alt=""
-                      className="profile-img "
-                      style={{
-                        borderRadius: "100%",
-                        height: "4rem",
-                        width: "6rem",
-                      }}
+                      alt={bioProfile?.userName ? `${bioProfile.userName}'s profile photo` : "Your profile photo"}
+                      className="avatar avatar-md"
                     />
-
+                    <label htmlFor="post-text" className="sr-only">
+                      What do you want to share?
+                    </label>
                     <input
+                      id="post-text"
                       type="text"
                       className="rounded-pill ps-2 post-input w-100"
                       placeholder="What do you want to share?"
                       {...register("text", { required: true })}
                     />
                   </div>
-                  {/*  */}
-                  <div className=" d-flex align-items-center justify-content-between mt-1">
+                  <div className="d-flex align-items-center justify-content-between mt-1">
                     <div className="d-flex justify-content-between home-post-error-state align-items-center">
                       <div className="w-100 text-end m-auto">
-                        <span className="text-danger   fs-6  fw-bold">
-                          {errors.text?.message}
-                        </span>
+                        <span className="text-danger fs-6 fw-bold">{errors.text?.message}</span>
                       </div>
                     </div>
                     <button
@@ -321,7 +190,7 @@ const Home = () => {
                     </button>
                   </div>
                 </form>
-                <div className="position-absolute top-50  mt-3">
+                <div className="position-absolute top-50 mt-3">
                   <Post />
                 </div>
               </div>
@@ -333,125 +202,146 @@ const Home = () => {
                   onHide={() => setModalShow(false)}
                   onCommentAdded={handleCommentAdded}
                 />
-                {timeLine.length < 1 && (
-                  <p className="fs-5  fw-bold">
-                    No posts yet,create a post or follow others to see posts on
-                    your timeline👌
-                  </p>
+                {isLoading && timeLine.length < 1 && (
+                  <div className="d-flex justify-content-center py-5" role="status" aria-label="Loading your timeline">
+                    <SpinnerLoader />
+                  </div>
+                )}
+                {!isLoading && timeLine.length < 1 && (
+                  <EmptyState icon="📭" title="No posts yet">
+                    Create a post or follow others to see posts on your timeline.
+                  </EmptyState>
                 )}
                 {timeLine?.map((person) => {
-                  const { _id, name, time, post, profileImg, postImg, follow } =
-                    person;
-                  const isLiked =
-                    likedPosts[_id] && likedPosts[_id].includes(userId);
-                  const likeCount = likeCounts[_id] || 0;
-                  const isOwnPost = person.user._id === userId; // Check if the post belongs to the current user
+                  const { _id } = person;
+                  const isLiked = Boolean(person.likes?.includes(userId));
+                  const likeCount = person.likes?.length || 0;
+                  const isOwnPost = person.user._id === userId;
+                  const isEditing = editingPostId === _id;
 
                   return (
-                    <div
-                      key={_id}
-                      className="p-2 mb-3 rounded-2 scroll-page position-relative"
-                    >
-                      {/* top div */}
-                      <div className="d-flex justify-content-between align-items-center  ">
-                        {/* img and time */}
-                        <div className="d-flex gap-2 align-items-center">
+                    <article key={_id} className="p-2 mb-3 rounded-2 scroll-page position-relative">
+                      <div className="d-flex justify-content-between align-items-center gap-2">
+                        <div className="d-flex gap-2 align-items-center" style={{ minWidth: 0 }}>
                           <img
                             src={person?.user?.profilePhoto}
-                            alt=""
-                            className="profile-img "
-                            style={{
-                              borderRadius: "100%",
-                              height: "4rem",
-                              width: "4rem",
-                            }}
+                            alt={`${person.user.userName}'s profile photo`}
+                            className="avatar avatar-md flex-shrink-0"
                           />
-                          <span className="d-flex flex-column justify-content-center ">
-                            <h5 className="pt-3">{person.user.userName}</h5>
-                            <p>
+                          <span className="d-flex flex-column justify-content-center" style={{ minWidth: 0 }}>
+                            <h5 className="pt-3 mb-0 text-truncate">{person.user.userName}</h5>
+                            <p className="mb-0">
                               <TimeAgo date={person?.createdAt} />
                             </p>
                           </span>
                         </div>
 
-                        {/* btn-div */}
-                        <div>
+                        <div className="flex-shrink-0">
                           {!isOwnPost && (
-                            <div>
-                              <button
-                                className="btn rounded-5 border"
-                                onClick={() => handleUnfollow(person.user._id)}
-                              >
-                                Following
-                              </button>
-                            </div>
+                            <button
+                              type="button"
+                              className="btn btn-outline-primary btn-sm rounded-pill px-3"
+                              onClick={() => handleUnfollow(person.user._id)}
+                            >
+                              Following
+                            </button>
                           )}
                         </div>
                       </div>
-                      <div className="d-flex justify-content-end  position-absolute top-0 end-0 position-relative  pe-4 pt-3">
-                        {isOwnPost && (
-                          <div onClick={() => toggleShow(_id)}>
-                            <p role="button" className="fs-2">
-                              ...
-                            </p>
+
+                      {isOwnPost && (
+                        <div data-post-options className="position-absolute top-0 end-0 mt-2 me-2 z-3">
+                          <div className="position-relative">
+                            <button
+                              type="button"
+                              className="btn-icon fs-4"
+                              aria-haspopup="menu"
+                              aria-expanded={showOptionsPostId === _id}
+                              aria-label="Post options"
+                              onClick={() => toggleShow(_id)}
+                            >
+                              ⋯
+                            </button>
+                            {showOptionsPostId === _id && (
+                              <div
+                                role="menu"
+                                className="shadow rounded-3 text-start position-absolute end-0 border bg-light overflow-hidden"
+                                style={{ top: "100%", minWidth: "9rem" }}
+                              >
+                                <button
+                                  type="button"
+                                  role="menuitem"
+                                  className="btn btn-link text-success d-block w-100 text-start px-3 py-2 rounded-0"
+                                  onClick={() => {
+                                    setEditingPostId(_id);
+                                    setShowOptionsPostId(null);
+                                  }}
+                                >
+                                  Edit
+                                </button>
+                                <button
+                                  type="button"
+                                  role="menuitem"
+                                  className="btn btn-link text-danger d-block w-100 text-start px-3 py-2 rounded-0"
+                                  onClick={() => handleDeletePost(_id)}
+                                >
+                                  Delete
+                                </button>
+                              </div>
+                            )}
                           </div>
-                        )}
-                      </div>
-                      {showOptionsPostId === _id && (
-                        <div className="shadow rounded w-25 text-center position-absolute top-50 end-0 translate-middle-y me-5 border z-2 bg-light">
-                          <p
-                            className="text-danger"
-                            role="button"
-                            onClick={() => handleDeletePost(_id)}
-                          >
-                            Delete
-                          </p>
-                          <p className="text-success">Edit</p>
                         </div>
                       )}
 
-                      {/* post */}
-                      <p>{person.text}</p>
+                      {isEditing ? (
+                        <EditPostForm
+                          initialText={person.text}
+                          isSaving={isSavingEdit}
+                          onCancel={() => setEditingPostId(null)}
+                          onSave={(data) => handleSaveEdit(_id, data)}
+                        />
+                      ) : (
+                        <p>{person.text}</p>
+                      )}
 
-                      {/* post-img */}
-                      <LazyLoadImage
-                        height={"100%"}
-                        width={"100%"}
-                        effect="blur"
-                        src={person.imagePath}
-                      />
+                      {person.imagePath && (
+                        <LazyLoadImage
+                          effect="blur"
+                          wrapperClassName="post-image-frame"
+                          className="post-image"
+                          src={person.imagePath}
+                          alt={`Image shared by ${person.user.userName}`}
+                        />
+                      )}
 
-                      {/* reactions */}
-                      <main className="d-flex pt-2 justify-content-between align-items-center">
-                        {/* like and comment */}
-
-                        <div className="d-flex gap-2 ">
-                          <div onClick={() => handleLike(_id)}>
-                            <img
-                              src={isLiked ? likeImg : unLikeImg}
-                              alt=""
-                              role="button"
-                            />
-                          </div>
-                          <div className="mt-2">{likeCount} like(s)</div>{" "}
-                          <div
-                            show={modalShow}
+                      <div className="d-flex pt-2 justify-content-between align-items-center">
+                        <div className="d-flex gap-2 align-items-center">
+                          <button
+                            type="button"
+                            className="btn-icon"
+                            aria-pressed={isLiked}
+                            aria-label={isLiked ? "Unlike this post" : "Like this post"}
+                            onClick={() => handleLike(_id)}
+                          >
+                            <img src={isLiked ? likeImg : unLikeImg} alt="" aria-hidden="true" />
+                          </button>
+                          <span>{likeCount} like(s)</span>
+                          <button
+                            type="button"
+                            className="btn-icon"
+                            aria-label="View comments"
                             onClick={() => openCommentModal(_id)}
                           >
-                            <img src={commentImg} alt="" role="button" />
-                          </div>
-                          <p className="mt-2">
-                            {" "}
-                            {person.commentsCount} comment(s){" "}
-                          </p>
+                            <img src={commentImg} alt="" aria-hidden="true" />
+                          </button>
+                          <span>{person.commentsCount} comment(s)</span>
                         </div>
 
-                        {/* share */}
-                        <div>
-                          <img src={shareImg} alt="" role="button" />
-                        </div>
-                      </main>
-                    </div>
+                        <button type="button" className="btn-icon" aria-label="Share this post">
+                          <img src={shareImg} alt="" aria-hidden="true" />
+                        </button>
+                      </div>
+                    </article>
                   );
                 })}
               </div>
@@ -459,7 +349,6 @@ const Home = () => {
           </main>
         </div>
       </div>
-      {/* fixed section */}
       <NavSection />
     </>
   );

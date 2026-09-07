@@ -75,7 +75,6 @@ const userSchema = new Schema({
     
 },{timestamps:true});
 
-// hashing password
 userSchema.pre("save",async function(next){
     if(!this.isModified("password")){
         next()
@@ -85,13 +84,11 @@ userSchema.pre("save",async function(next){
     next()
 })
 
-// password comparison
 userSchema.methods.comparePassword = async function(userPassword){
     const isCorrect = await bcrypt.compare(userPassword, this.password);
     return isCorrect;
 }
 
-// generate jwt token
 userSchema.methods.generateToken = async function(params){
     let token = jwt.sign({userId:this._id,userName:this.userName},process.env.JWT_SECRET,{
         expiresIn: '24h',
@@ -100,7 +97,6 @@ userSchema.methods.generateToken = async function(params){
     return token;
 }
 
-// generating reset password token
 userSchema.methods.getResetPasswordToken = function () {
     const resetToken = crypto.randomBytes(20).toString("hex");
     this.resetPasswordToken = crypto

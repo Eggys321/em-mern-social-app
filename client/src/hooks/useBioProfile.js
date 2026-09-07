@@ -1,34 +1,18 @@
 import { useQuery } from "@tanstack/react-query";
+import { get } from "../api/client";
 
 const fetchBioProfile = async ({ queryKey }) => {
   const token = queryKey[1];
-  const response = await fetch(
-    "https://em-mern-social-app.onrender.com/api/v1/users",
-    {
-      headers: {
-        "Content-type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
-  if (!response.ok) {
-    throw new Error("Network response was not ok");
-  }
-  const data = await response.json();
-  // console.log('API Response:', data);
-  return data;
+  return get("/users", { auth: false, headers: { Authorization: `Bearer ${token}` } });
 };
 
 export const useBioProfile = (token) => {
   return useQuery({
     queryKey: ["bioProfile", token],
     queryFn: fetchBioProfile,
-    staleTime: 30000, // 30 seconds
-    cacheTime: 600000, // 10 minutes
+    enabled: Boolean(token),
+    staleTime: 30_000,
+    gcTime: 600_000,
     refetchOnWindowFocus: true,
-    // queryKey: ["bioProfile", token],
-    // queryFn: fetchBioProfile,
-    // staleTime: Infinity,
-    // cacheTime: Infinity,
   });
 };

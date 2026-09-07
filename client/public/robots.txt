@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /signin$
+Allow: /signup$
+Allow: /resetpassword$
+Disallow: /
+
+Sitemap: https://em-mern-social-app.vercel.app/sitemap.xml
